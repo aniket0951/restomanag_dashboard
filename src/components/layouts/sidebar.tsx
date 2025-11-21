@@ -10,6 +10,7 @@ import {
 } from "lucide-react";
 import { useState } from "react";
 import { useUserStore } from "../../store/user_store";
+import { useNavigate } from "react-router-dom";
 
 const menuItems = [
   {
@@ -63,10 +64,13 @@ const menuItems = [
     id: "restaurants",
     icon: Hotel,
     lable: "Restaurants",
+    link: "/dashboard/restaurants",
   },
 ];
 
 function SideBar({ collapsed, onToggle, currentPage, onPageChange }) {
+  const navigate = useNavigate();
+
   const [expanedItem, setexpanedItem] = useState(new Set(["analytics"]));
   const toggleExpanded = (itemid: string) => {
     const newExpanded = new Set(expanedItem);
@@ -126,11 +130,19 @@ function SideBar({ collapsed, onToggle, currentPage, onPageChange }) {
                         ? "bg-gradient-to-r from-blue-500 to-purple-600 text-white shadow-lg shadow-blue-500/25"
                         : "text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800/50"
                     }`}
+                  // onClick={() => {
+                  //   if (item.submenu) {
+                  //     toggleExpanded(item.id);
+                  //   } else {
+                  //     onPageChange(item.id);
+                  //   }
+                  // }}
+                  //
                   onClick={() => {
                     if (item.submenu) {
                       toggleExpanded(item.id);
-                    } else {
-                      onPageChange(item.id);
+                    } else if (item.link) {
+                      navigate(item.link);
                     }
                   }}
                 >

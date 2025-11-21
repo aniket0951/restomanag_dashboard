@@ -6,6 +6,8 @@ import OwnerSignUp from "./auth/owner_signup";
 
 import { Navigate } from "react-router-dom";
 import RestaurantFullDetails from "./components/layouts/restaurants/restaurant_full_details";
+import Dashboard from "./dashboard/dashboard";
+import Restaurants from "./components/layouts/restaurants/restaurants";
 
 export function ProtectedRoute({ children }: { children: JSX.Element }) {
   const token = localStorage.getItem("authToken");
@@ -30,22 +32,14 @@ function App() {
       <Routes>
         <Route path="/" element={<Login />} />
         <Route path="/signup" element={<OwnerSignUp />} />
-        <Route
-          path="/dashboard"
-          element={
-            <ProtectedRoute>
-              <Home />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/restaurantDetails/:id"
-          element={
-            <ProtectedRoute>
-              <RestaurantFullDetails />
-            </ProtectedRoute>
-          }
-        />
+
+        <Route path="/dashboard" element={<Home />}>
+          {/* Dashboard pages go inside Home */}
+          <Route index element={<Dashboard />} />
+          {/*<Route path="orders" element={<Orders />} />*/}
+          <Route path="restaurants" element={<Restaurants />} />
+          <Route path="restaurants/:id" element={<RestaurantFullDetails />} />
+        </Route>
       </Routes>
       <Toaster position="top-right" />
     </div>
