@@ -40,3 +40,10 @@ export interface ListCategoriesRes {
   description: string;
   restaurantPID: string;
 }
+
+export interface CreateCategoryRes {
+  pid: string;
+  name: string;
+  description: string;
+  restaurantPID: string;
+}

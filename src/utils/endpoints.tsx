@@ -14,4 +14,5 @@ export const EndPoint = {
 
   // Categories
   ListMenuCategoriesByRestaurant: `${Categories}`,
+  CreateMenuCategory: `${Categories}create`,
 };

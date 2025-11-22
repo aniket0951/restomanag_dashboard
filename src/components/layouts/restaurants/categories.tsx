@@ -1,10 +1,11 @@
-import { useEffect, useRef, useState } from "react";
-import { Plus, Rss } from "lucide-react";
+import { useCallback, useEffect, useState } from "react";
+import { Plus } from "lucide-react";
 import { rounded_button } from "../../../utils/csstags";
 import type { ListCategoriesRes } from "../../../types/restaurant";
 import { getApi } from "../../../utils/api";
 import { EndPoint } from "../../../utils/endpoints";
 import { LocalStorageKey } from "../../../utils/constants";
+import { useNavigate } from "react-router-dom";
 
 const th_class: string =
   "text-left p-4 text-sm font-semibold text-white border-r border-slate-200 dark:border-slate-700";
@@ -12,43 +13,43 @@ const td: string = "p-4 border-r border-slate-200 dark:border-slate-700";
 const td_span: string =
   "text-gray-400 dark:text-gray-400 font-medium font-sans";
 const parent_div: string =
-  "bg-white/80 dark:bg-slate-800 rounded-xl backdrop-blur-xl overflow-hidden w-full p-2 m-3 border border-slate-200/50 dark:border-slate-700/50";
+  "bg-white/80 bg-slate-800 dark:bg-slate-800 rounded-xl backdrop-blur-xl overflow-hidden w-full p-2 m-3 border border-slate-200/50 dark:border-slate-700/50";
 
 function Categories() {
+  const navigate = useNavigate();
   const [categories, setCategories] = useState<ListCategoriesRes[]>([]);
-  const [isDataAvailable, setIsDataAvailable] = useState(false);
-  const calledRef = useRef(false);
+  const [page, setPage] = useState(1);
+
+  const fetchCategories = useCallback(async () => {
+    try {
+      const restaurant_pid = localStorage.getItem(
+        LocalStorageKey.CurrentRestaurant,
+      );
+      const endpoint =
+        EndPoint.ListMenuCategoriesByRestaurant +
+        restaurant_pid +
+        "?page=" +
+        page;
+      const res = await getApi<ListCategoriesRes[]>(endpoint);
+      setCategories(res.data);
+    } catch (err) {
+      console.log("Error fetching categories : ", err);
+    }
+  }, [page]);
 
   useEffect(() => {
-    if (calledRef.current) return;
-    calledRef.current = true;
-
     fetchCategories();
-  }, []);
+  }, [page, fetchCategories]);
 
-  const fetchCategories = async () => {
-    const restaurant_pid = localStorage.getItem(
-      LocalStorageKey.CurrentRestaurant,
-    );
-    try {
-      const res = await getApi<ListCategoriesRes[]>(
-        EndPoint.ListMenuCategoriesByRestaurant + restaurant_pid,
-      );
+  const fecthNextCategory = () => setPage((p) => p + 1);
 
-      if (res.data.length > 0) {
-        setIsDataAvailable(true);
-        setCategories(res.data);
-      } else {
-        setIsDataAvailable(false);
-      }
-    } catch {
-      console.log("Error");
-    }
+  const fecthPreviousCategory = () => {
+    setPage((p) => Math.max(p - 1, 1));
   };
 
   return (
     <>
-      {isDataAvailable ? (
+      {categories.length > 0 ? (
         <div className={parent_div}>
           <div className="p-6 border-b border-slate-200/50 dark:border-slate-700/50">
             <div className="flex items-center justify-between">
@@ -59,7 +60,7 @@ function Categories() {
               </div>
               <button
                 className={`${rounded_button} cursor-pointer`}
-                // onClick={() => setIsFormOpen(true)}
+                onClick={() => navigate("/dashboard/categories/create")}
               >
                 <Plus className="w-4 h-4" />
                 <span className="text-sm font-medium">Add New</span>
@@ -80,7 +81,7 @@ function Categories() {
                 {categories.map((restaurant, index) => (
                   <tr
                     className="cursor-pointer border-b border-slate-200/50 dark:border-slate-700/50
-            hover:bg-slate-50/50 dark:hover:bg-slate-800/50 transition-colors"
+          hover:bg-slate-50/50 dark:hover:bg-slate-800/50 transition-colors"
                     key={restaurant.pid}
                   >
                     <td className={td}>
@@ -97,6 +98,25 @@ function Categories() {
                 ))}
               </tbody>
             </table>
+          </div>
+          <div className="flex items-center justify-end p-1 border-t border-slate-200/50 dark:border-slate-700/50">
+            <span className="text-sm text-slate-600 dark:text-slate-300 m-3">
+              Page {page}
+            </span>
+            <button
+              disabled={page === 1}
+              onClick={fecthPreviousCategory}
+              className="px-4 py-2 m-1.5 bg-slate-200 dark:bg-slate-700 rounded-lg disabled:opacity-40 cursor-pointer text-white dark:text-white"
+            >
+              Previous
+            </button>
+
+            <button
+              onClick={fecthNextCategory}
+              className={`${rounded_button} cursor-pointer`}
+            >
+              Next
+            </button>
           </div>
         </div>
       ) : (

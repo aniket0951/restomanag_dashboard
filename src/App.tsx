@@ -9,8 +9,9 @@ import RestaurantFullDetails from "./components/layouts/restaurants/restaurant_f
 import Dashboard from "./dashboard/dashboard";
 import Restaurants from "./components/layouts/restaurants/restaurants";
 import Categories from "./components/layouts/restaurants/categories";
+import CreateUpdateCategories from "./components/layouts/restaurants/create_update_categories";
 
-export function ProtectedRoute({ children }: { children: JSX.Element }) {
+export function ProtectedRoute({ children }: { children: React.ReactNode }) {
   const token = localStorage.getItem("authToken");
 
   if (!token) {
@@ -41,6 +42,10 @@ function App() {
           <Route path="restaurants" element={<Restaurants />} />
           <Route path="restaurants/:id" element={<RestaurantFullDetails />} />
           <Route path="categories" element={<Categories />} />
+          <Route
+            path="categories/create"
+            element={<CreateUpdateCategories />}
+          />
         </Route>
       </Routes>
       <Toaster position="top-right" />
