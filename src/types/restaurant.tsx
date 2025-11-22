@@ -33,3 +33,10 @@ export interface GetRestaurantRes {
   open_time: string;
   close_time: string;
 }
+
+export interface ListCategoriesRes {
+  pid: string;
+  name: string;
+  description: string;
+  restaurantPID: string;
+}

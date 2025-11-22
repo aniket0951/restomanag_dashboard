@@ -8,6 +8,7 @@ import { Navigate } from "react-router-dom";
 import RestaurantFullDetails from "./components/layouts/restaurants/restaurant_full_details";
 import Dashboard from "./dashboard/dashboard";
 import Restaurants from "./components/layouts/restaurants/restaurants";
+import Categories from "./components/layouts/restaurants/categories";
 
 export function ProtectedRoute({ children }: { children: JSX.Element }) {
   const token = localStorage.getItem("authToken");
@@ -39,6 +40,7 @@ function App() {
           {/*<Route path="orders" element={<Orders />} />*/}
           <Route path="restaurants" element={<Restaurants />} />
           <Route path="restaurants/:id" element={<RestaurantFullDetails />} />
+          <Route path="categories" element={<Categories />} />
         </Route>
       </Routes>
       <Toaster position="top-right" />

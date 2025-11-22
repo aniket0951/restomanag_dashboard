@@ -13,6 +13,7 @@ import type {
 } from "../../../types/restaurant";
 import { EndPoint } from "../../../utils/endpoints";
 import toast from "react-hot-toast";
+import { LocalStorageKey } from "../../../utils/constants";
 
 const th_class: string =
   "text-left p-4 text-sm font-semibold text-slate-600 border-r border-slate-200 dark:border-slate-700";
@@ -175,6 +176,16 @@ function Restaurants() {
     } catch (err) {
       console.error(err);
     }
+  };
+
+  const switchRestaurant = (restaurant_id: string) => {
+    localStorage.setItem(LocalStorageKey.CurrentRestaurant, restaurant_id);
+    navigate("/dashboard");
+  };
+
+  const displayRestaurantDetails = (restaurant_id: string) => {
+    localStorage.setItem(LocalStorageKey.CurrentRestaurant, restaurant_id);
+    navigate("/dashboard/restaurants/" + restaurant_id);
   };
 
   return (
@@ -465,37 +476,38 @@ function Restaurants() {
                 <tbody>
                   {restaurants.map((restaurant) => (
                     <tr
-                      onClick={() =>
-                        navigate("/dashboard/restaurants/" + restaurant.pid)
-                      }
+                      onClick={() => displayRestaurantDetails(restaurant.pid)}
                       className="cursor-pointer border-b border-slate-200/50 dark:border-slate-700/50
                 hover:bg-slate-50/50 dark:hover:bg-slate-800/50 transition-colors"
+                      key={restaurant.pid}
                     >
-                      <td key={restaurant.pid} className={td}>
+                      <td className={td}>
                         <span className={td_span}>{restaurant.name}</span>
                       </td>
 
-                      <td key={restaurant.pid} className={td}>
+                      <td className={td}>
                         <span className={td_span}>{restaurant.state}</span>
                       </td>
-                      <td key={restaurant.pid} className={td}>
+                      <td className={td}>
                         <span className={td_span}>{restaurant.city}</span>
                       </td>
 
-                      <td key={restaurant.pid} className={td}>
+                      <td className={td}>
                         <span className={td_span}>{restaurant.cuisine}</span>
                       </td>
-                      <td key={restaurant.pid} className={td}>
+                      <td className={td}>
                         <span className={td_span}>{restaurant.food_type}</span>
                       </td>
-                      <td key={restaurant.pid} className={td}>
-                        <div className="flex gap-2 items-center">
-                          <button className={action_button}>
-                            <Pencil className="w-full h-4.5" />
-                          </button>
-
-                          <button className={action_button}>
-                            <Trash className="w-full h-4.5 " />
+                      <td className={td}>
+                        <div className="flex  items-center">
+                          <button
+                            className={action_button}
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              switchRestaurant(restaurant.pid);
+                            }}
+                          >
+                            <span>Switch</span>
                           </button>
                         </div>
                       </td>

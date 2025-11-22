@@ -43,10 +43,12 @@ const menuItems = [
       {
         id: "all-users",
         label: "All Users",
+        link: "/dashboard/categories",
       },
       {
         id: "role",
         label: "Role & Permission",
+        link: "/dashboard/categories",
       },
     ],
   },
@@ -65,6 +67,13 @@ const menuItems = [
     icon: Hotel,
     lable: "Restaurants",
     link: "/dashboard/restaurants",
+    submenu: [
+      {
+        id: "category",
+        label: "Categories",
+        link: "/dashboard/categories",
+      },
+    ],
   },
 ];
 
@@ -130,17 +139,10 @@ function SideBar({ collapsed, onToggle, currentPage, onPageChange }) {
                         ? "bg-gradient-to-r from-blue-500 to-purple-600 text-white shadow-lg shadow-blue-500/25"
                         : "text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800/50"
                     }`}
-                  // onClick={() => {
-                  //   if (item.submenu) {
-                  //     toggleExpanded(item.id);
-                  //   } else {
-                  //     onPageChange(item.id);
-                  //   }
-                  // }}
-                  //
                   onClick={() => {
                     if (item.submenu) {
                       toggleExpanded(item.id);
+                      navigate(item.link);
                     } else if (item.link) {
                       navigate(item.link);
                     }
@@ -172,6 +174,9 @@ function SideBar({ collapsed, onToggle, currentPage, onPageChange }) {
                         <button
                           className="w-full text-left p-2 text-sm text-slate-600 dark:text-slate-400 hover:text-slate-800
                         dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800/50 rounded-lg transition-all"
+                          onClick={() => {
+                            navigate(subitems.link);
+                          }}
                         >
                           {subitems.label}
                         </button>
