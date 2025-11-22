@@ -9,4 +9,5 @@ export const EndPoint = {
   // Restaurant
   CreateRestaurant: `${Restaurant}create`,
   ListRestaurant: `${Restaurant}list`,
+  GetRestaurant: `${Restaurant}`,
 };

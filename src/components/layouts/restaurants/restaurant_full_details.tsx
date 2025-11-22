@@ -1,3 +1,9 @@
+import { useEffect, useRef, useState } from "react";
+import { useParams } from "react-router-dom";
+
+import { getApi } from "../../../utils/api";
+import type { GetRestaurantRes } from "../../../types/restaurant";
+import { EndPoint } from "../../../utils/endpoints";
 const owner_details_h3: string =
   "text-gray-400 dark:text-gray-400 font-medium font-sans";
 
@@ -7,6 +13,27 @@ const parent_div: string =
 const div_h2: string = "dark:text-white font-black";
 
 function RestaurantFullDetails() {
+  const { id } = useParams();
+  const [restaurantDetails, setRestaurantDetails] =
+    useState<GetRestaurantRes | null>(null);
+  const calledRef = useRef(false);
+
+  useEffect(() => {
+    if (calledRef.current) return;
+    calledRef.current = true;
+
+    fetchRestaurantDetails();
+  }, []);
+
+  const fetchRestaurantDetails = async () => {
+    try {
+      const res = await getApi<GetRestaurantRes>(EndPoint.GetRestaurant + id);
+      setRestaurantDetails(res.data);
+    } catch {
+      console.log("Error");
+    }
+  };
+
   return (
     <div className="flex justify-between">
       {/* Owner Details */}
@@ -43,37 +70,49 @@ function RestaurantFullDetails() {
           <div className="grid grid-cols-2 gap-4 p-4">
             <div className="p-1">
               <h2 className={div_h2}>Name</h2>
-              <span className={owner_details_h3}>Taj Mahala</span>
+              <span className={owner_details_h3}>
+                {restaurantDetails?.name ?? "NA"}
+              </span>
             </div>
             <div className="p-1">
               <h2 className={div_h2}>Address</h2>
               <span className={owner_details_h3}>
-                Somnath Nagar, viman nagar , pune , 414111
+                {restaurantDetails
+                  ? `${restaurantDetails.address_line1}, ${restaurantDetails.city}, ${restaurantDetails.state}`
+                  : "NA"}
               </span>
             </div>
             <div className="p-1">
               <h2 className={div_h2}>Cuisine</h2>
               <span className={owner_details_h3}>
-                Italian,French,Mediterranean
+                {restaurantDetails?.cuisine ?? "NA"}
               </span>
             </div>
             <div className="p-1">
               <h2 className={div_h2}>Food Type</h2>
-              <span className={owner_details_h3}>Veg</span>
+              <span className={owner_details_h3}>
+                {restaurantDetails?.food_type ?? "NA"}
+              </span>
             </div>
             <div className="p-1">
               <h2 className={div_h2}>Contact No</h2>
-              <span className={owner_details_h3}>8262565514</span>
+              <span className={owner_details_h3}>
+                {restaurantDetails?.contact_no ?? "NA"}
+              </span>
             </div>
             <div className="p-1 flex justify-baseline">
               <div className="p-2">
                 <h2 className={div_h2}>Open Time</h2>
-                <span className={owner_details_h3}>12:00 AM</span>
+                <span className={owner_details_h3}>
+                  {restaurantDetails?.open_time ?? "NA"}
+                </span>
               </div>
 
               <div className="p-2">
                 <h2 className={div_h2}>Close Time</h2>
-                <span className={owner_details_h3}>12:00 AM</span>
+                <span className={owner_details_h3}>
+                  {restaurantDetails?.close_time ?? "NA"}
+                </span>
               </div>
             </div>
           </div>
