@@ -34,14 +34,7 @@ function Home() {
           />
           {/* Page Content goes here */}
           <main className="flex-1 overflow-y-auto p-6 bg-transparent">
-            {/*<Outlet />*/}
-            {/*<Dashboard />*/}
-            <div className="p-6 space-y-6">
-              {currentPage === "dashboard" && <Dashboard />}
-              {currentPage === "orders" && <Orders />}
-              {currentPage === "restaurants" && <Restaurants />}
-              {currentPage === "restaurantDetails" && <RestaurantFullDetails />}
-            </div>
+            <Outlet />
           </main>
         </div>
       </div>

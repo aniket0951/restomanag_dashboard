@@ -466,7 +466,7 @@ function Restaurants() {
                   {restaurants.map((restaurant) => (
                     <tr
                       onClick={() =>
-                        navigate("/restaurantDetails/" + restaurant.pid)
+                        navigate("/dashboard/restaurants/" + restaurant.pid)
                       }
                       className="cursor-pointer border-b border-slate-200/50 dark:border-slate-700/50
                 hover:bg-slate-50/50 dark:hover:bg-slate-800/50 transition-colors"
