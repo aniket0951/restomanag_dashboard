@@ -1,46 +1,43 @@
-import { useCallback, useEffect, useState } from "react";
-import { Plus } from "lucide-react";
-import { rounded_button } from "../../../utils/csstags";
-import type { ListCategoriesRes } from "../../../types/restaurant";
-import { getApi } from "../../../utils/api";
-import { EndPoint } from "../../../utils/endpoints";
+import { useEffect, useState } from "react";
 import { LocalStorageKey } from "../../../utils/constants";
+import { getApi } from "../../../utils/api";
+import type { ListMenuItemsRes } from "../../../types/restaurant";
+import { EndPoint } from "../../../utils/endpoints";
+import { rounded_button } from "../../../utils/csstags";
+import { Plus } from "lucide-react";
 import { useNavigate } from "react-router-dom";
-import { unixToString } from "../../../utils/utils";
 
 const th_class: string =
   "text-left p-4 text-sm font-semibold text-white border-r border-slate-200 dark:border-slate-700";
-const td: string = "p-4 border-r border-slate-200 dark:border-slate-700";
+const td: string = "p-4 border-r border-slate-200 dark:border-slate-700 w-sm";
 const td_span: string =
   "text-gray-400 dark:text-gray-400 font-medium font-sans";
 const parent_div: string =
   "bg-white/80 bg-slate-800 dark:bg-slate-800 rounded-xl backdrop-blur-xl overflow-hidden w-full p-2 m-3 border border-slate-200/50 dark:border-slate-700/50";
 
-function Categories() {
-  const navigate = useNavigate();
-  const [categories, setCategories] = useState<ListCategoriesRes[]>([]);
+function Menus() {
+  const [menuItems, setMenuItems] = useState<ListMenuItemsRes[]>([]);
   const [page, setPage] = useState(1);
-
-  const fetchCategories = useCallback(async () => {
-    try {
-      const restaurant_pid = localStorage.getItem(
-        LocalStorageKey.CurrentRestaurant,
-      );
-      const endpoint =
-        EndPoint.ListMenuCategoriesByRestaurant +
-        restaurant_pid +
-        "?page=" +
-        page;
-      const res = await getApi<ListCategoriesRes[]>(endpoint);
-      setCategories(res.data);
-    } catch (err) {
-      console.log("Error fetching categories : ", err);
-    }
-  }, [page]);
+  const navigate = useNavigate();
 
   useEffect(() => {
-    fetchCategories();
-  }, [page, fetchCategories]);
+    fetchMenuItemsByRestaurant();
+  }, [page]);
+
+  const fetchMenuItemsByRestaurant = async () => {
+    try {
+      const restaurantPID = localStorage.getItem(
+        LocalStorageKey.CurrentRestaurant,
+      );
+      const endpoint: string =
+        EndPoint.ListMenuItemsByRestaurant + restaurantPID + "?page=" + page;
+      const res = await getApi<ListMenuItemsRes[]>(endpoint);
+
+      setMenuItems(res.data);
+    } catch {
+      console.log("");
+    }
+  };
 
   const fecthNextCategory = () => setPage((p) => p + 1);
 
@@ -48,20 +45,25 @@ function Categories() {
     setPage((p) => Math.max(p - 1, 1));
   };
 
+  const unixToString = (unixValue: number) => {
+    const date = new Date(unixValue * 1000);
+    return date.toISOString().split("T")[0];
+  };
+
   return (
     <>
-      {categories.length > 0 ? (
+      {menuItems.length > 0 ? (
         <div className={parent_div}>
           <div className="p-6 border-b border-slate-200/50 dark:border-slate-700/50">
             <div className="flex items-center justify-between">
               <div>
                 <h3 className="text-lg font-bold text-slate-800 dark:text-white">
-                  Menu Categories
+                  Menu Items
                 </h3>
               </div>
               <button
                 className={`${rounded_button} cursor-pointer`}
-                onClick={() => navigate("/dashboard/categories/create")}
+                onClick={() => navigate("/dashboard/menu/create")}
               >
                 <Plus className="w-4 h-4" />
                 <span className="text-sm font-medium">Add New</span>
@@ -74,27 +76,75 @@ function Categories() {
               <thead className="border-b border-slate-300 dark:border-slate-700">
                 <tr>
                   <th className={th_class}>ID</th>
-                  <th className={th_class}> Category Name </th>
+                  <th className={th_class}> Menu Name </th>
                   <th className={th_class}> Description </th>
+                  <th className={th_class}> Category </th>
+                  <th className={th_class}> Price </th>
+                  <th className={th_class}> Is Veg </th>
+                  <th className={th_class}> Is Available </th>
+                  <th className={th_class}> Preparation Time</th>
                   <th className={th_class}> Created At</th>
                 </tr>
               </thead>
               <tbody>
-                {categories.map((restaurant, index) => (
+                {menuItems.map((restaurant, index) => (
                   <tr
                     className="cursor-pointer border-b border-slate-200/50 dark:border-slate-700/50
-          hover:bg-slate-50/50 dark:hover:bg-slate-800/50 transition-colors"
+          hover:bg-slate-50/50 dark:hover:bg-slate-700/20 transition-colors"
                     key={restaurant.pid}
                   >
                     <td className={td}>
                       <span className={td_span}>{index + 1}</span>
                     </td>
                     <td className={td}>
-                      <span className={td_span}>{restaurant.name}</span>
+                      <span className={td_span}>
+                        {restaurant?.name ? restaurant.name : "NA"}
+                      </span>
                     </td>
 
                     <td className={td}>
-                      <span className={td_span}>{restaurant.description}</span>
+                      <span className={td_span}>
+                        {restaurant?.description
+                          ? restaurant.description
+                          : "NA"}
+                      </span>
+                    </td>
+                    <td className={td}>
+                      <span className={td_span}>
+                        {restaurant?.category_name
+                          ? restaurant.category_name
+                          : "NA"}
+                      </span>
+                    </td>
+                    <td className={td}>
+                      <span className={td_span}>
+                        {restaurant?.price ? `₹ ${restaurant.price}` : "NA"}
+                      </span>
+                    </td>
+                    <td className={td}>
+                      <span className={td_span}>
+                        {restaurant?.is_veg === true
+                          ? "Veg"
+                          : restaurant?.is_veg === false
+                            ? "Non Veg"
+                            : "NA"}
+                      </span>
+                    </td>
+                    <td className={td}>
+                      <span className={td_span}>
+                        {restaurant?.is_available === true
+                          ? "Yes"
+                          : restaurant?.is_available === false
+                            ? "No"
+                            : "NA"}
+                      </span>
+                    </td>
+                    <td className={td}>
+                      <span className={td_span}>
+                        {restaurant?.preparation_time
+                          ? `${restaurant.preparation_time} Min`
+                          : "NA"}
+                      </span>
                     </td>
                     <td className={td}>
                       <span className={td_span}>
@@ -142,4 +192,4 @@ function Categories() {
   );
 }
 
-export default Categories;
+export default Menus;

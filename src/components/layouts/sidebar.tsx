@@ -79,6 +79,11 @@ const menuItems = [
         label: "Categories",
         link: "/dashboard/categories",
       },
+      {
+        id: "menu",
+        label: "Menu",
+        link: "/dashboard/menu",
+      },
     ],
   },
 ];

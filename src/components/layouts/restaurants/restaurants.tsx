@@ -19,7 +19,6 @@ const th_class: string =
   "text-left p-4 text-sm font-semibold text-white border-r border-slate-200 dark:border-slate-700 hover";
 
 const td: string = "p-2 border-r border-slate-200 dark:border-slate-700";
-// const td_span: string = "text-sm font-medium text-blue dark:text-white";
 const td_span: string =
   "text-gray-400 dark:text-gray-400 font-medium font-sans";
 const form_label: string =
@@ -66,6 +65,7 @@ const FoodType = [
   },
 ];
 import type { UseFormSetValue, UseFormWatch } from "react-hook-form";
+import { unixToString } from "../../../utils/utils";
 
 // Add this interface near your other types
 interface TagsInputProps {
@@ -490,7 +490,8 @@ function Restaurants() {
                     <th className={th_class}> City </th>
                     <th className={th_class}> Cuisine </th>
                     <th className={th_class}> Food Type </th>
-                    <th className={th_class}>Action</th>
+                    <th className={th_class}> Action</th>
+                    <th className={th_class}> Created At</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -533,6 +534,11 @@ function Restaurants() {
                             <span>Switch</span>
                           </button>
                         </div>
+                      </td>
+                      <td className={td}>
+                        <span className={td_span}>
+                          {unixToString(restaurant.created_at)}
+                        </span>
                       </td>
                     </tr>
                   ))}

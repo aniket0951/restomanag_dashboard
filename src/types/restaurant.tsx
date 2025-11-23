@@ -18,6 +18,7 @@ export interface ListRestaurantsRes {
   pincode: string;
   cuisine: string;
   food_type: string;
+  created_at: number;
 }
 
 export interface GetRestaurantRes {
@@ -39,6 +40,7 @@ export interface ListCategoriesRes {
   name: string;
   description: string;
   restaurantPID: string;
+  created_at: number;
 }
 
 export interface CreateCategoryRes {
@@ -46,4 +48,34 @@ export interface CreateCategoryRes {
   name: string;
   description: string;
   restaurantPID: string;
+}
+
+export interface ListMenuItemsRes {
+  pid: string;
+  name: string;
+  description: string;
+  price: number;
+  is_veg: boolean;
+  is_available: boolean;
+  preparation_time: number;
+  restaurant_pid: string;
+  category_pid: string;
+  category_name: string;
+  created_at: number;
+}
+
+export interface CreateMenuItemsRes {
+  pid: string;
+  name: string;
+  description: string;
+  price: number;
+  is_veg: boolean;
+  is_available: boolean;
+  preparation_time: number;
+  restaurant_pid: string;
+}
+
+export interface ListMenuCategoryNameByRestaurantRes {
+  name: string;
+  pid: string;
 }
