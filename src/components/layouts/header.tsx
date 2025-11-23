@@ -9,7 +9,11 @@ import {
 } from "lucide-react";
 import { useUserStore } from "../../store/user_store";
 
-function Header({ sidebarCollapsed, onToggleSidebar }) {
+type HeaderProps = {
+  onToggleSidebar: () => void;
+};
+
+function Header({ onToggleSidebar }: HeaderProps) {
   const user = useUserStore((state) => state.user);
 
   return (

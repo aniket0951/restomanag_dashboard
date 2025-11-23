@@ -8,8 +8,12 @@ import { Navigate } from "react-router-dom";
 import RestaurantFullDetails from "./components/layouts/restaurants/restaurant_full_details";
 import Dashboard from "./dashboard/dashboard";
 import Restaurants from "./components/layouts/restaurants/restaurants";
+import Categories from "./components/layouts/restaurants/categories";
+import CreateUpdateCategories from "./components/layouts/restaurants/create_update_categories";
+import Menus from "./components/layouts/restaurants/menus";
+import CreateMenuItems from "./components/layouts/restaurants/create_update_menu";
 
-export function ProtectedRoute({ children }: { children: JSX.Element }) {
+export function ProtectedRoute({ children }: { children: React.ReactNode }) {
   const token = localStorage.getItem("authToken");
 
   if (!token) {
@@ -36,9 +40,15 @@ function App() {
         <Route path="/dashboard" element={<Home />}>
           {/* Dashboard pages go inside Home */}
           <Route index element={<Dashboard />} />
-          {/*<Route path="orders" element={<Orders />} />*/}
           <Route path="restaurants" element={<Restaurants />} />
           <Route path="restaurants/:id" element={<RestaurantFullDetails />} />
+          <Route path="categories" element={<Categories />} />
+          <Route
+            path="categories/create"
+            element={<CreateUpdateCategories />}
+          />
+          <Route path="menu" element={<Menus />} />
+          <Route path="menu/create" element={<CreateMenuItems />} />
         </Route>
       </Routes>
       <Toaster position="top-right" />

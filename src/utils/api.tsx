@@ -2,7 +2,6 @@ import axios, { AxiosError } from "axios";
 import toast from "react-hot-toast";
 import type { AxiosResponse } from "axios";
 import { BASE_URL } from "./endpoints";
-import { useNavigate } from "react-router-dom";
 
 export interface ApiResponse<T> {
   status: string;
@@ -13,7 +12,7 @@ export interface ApiResponse<T> {
 
 export const api = axios.create({
   baseURL: BASE_URL,
-  withCredentials: true,
+  withCredentials: false,
   headers: {
     "Content-Type": "application/json",
   },
