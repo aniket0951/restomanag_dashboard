@@ -14,6 +14,7 @@ import type {
 import { EndPoint } from "../../../utils/endpoints";
 import toast from "react-hot-toast";
 import { LocalStorageKey } from "../../../utils/constants";
+import type { Restaurant as restaurantInterface } from "../../../store/user_store";
 
 const th_class: string =
   "text-left p-4 text-sm font-semibold text-white border-r border-slate-200 dark:border-slate-700 hover";
@@ -66,6 +67,7 @@ const FoodType = [
 ];
 import type { UseFormSetValue, UseFormWatch } from "react-hook-form";
 import { unixToString } from "../../../utils/utils";
+import { restaurantStore } from "../../../store/user_store";
 
 // Add this interface near your other types
 interface TagsInputProps {
@@ -147,6 +149,7 @@ function Restaurants() {
   const [selectedState, setSelectedState] = useState("");
   const [restaurants, setRestaurants] = useState<ListRestaurantsRes[]>([]);
   const [page, setPage] = useState(1);
+  const setRestoStore = restaurantStore((state) => state.setRestaurant);
 
   useEffect(() => {
     fetchRestaurants();
@@ -192,8 +195,13 @@ function Restaurants() {
     }
   };
 
-  const switchRestaurant = (restaurant_id: string) => {
-    localStorage.setItem(LocalStorageKey.CurrentRestaurant, restaurant_id);
+  const switchRestaurant = (restaurant: ListRestaurantsRes) => {
+    localStorage.setItem(LocalStorageKey.CurrentRestaurant, restaurant.pid);
+    const restoInterface: restaurantInterface = {
+      id: restaurant.pid,
+      name: restaurant.name,
+    };
+    setRestoStore(restoInterface);
     navigate("/dashboard");
   };
 
