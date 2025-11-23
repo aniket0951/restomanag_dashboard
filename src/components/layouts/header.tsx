@@ -7,7 +7,7 @@ import {
   Settings,
   Sun,
 } from "lucide-react";
-import { useUserStore } from "../../store/user_store";
+import { useUserStore, restaurantStore } from "../../store/user_store";
 
 type HeaderProps = {
   onToggleSidebar: () => void;
@@ -15,6 +15,7 @@ type HeaderProps = {
 
 function Header({ onToggleSidebar }: HeaderProps) {
   const user = useUserStore((state) => state.user);
+  const restaurantstore = restaurantStore((state) => state.restaurant);
 
   return (
     <div className="bg-white/80 dark:bg-slate-900/80 backdrop-blur-xl border-b border-slate-200/50 dark:border-slate-700/50 px-6 py-3">
@@ -91,7 +92,7 @@ function Header({ onToggleSidebar }: HeaderProps) {
                 {user?.name || "Unknow"}
               </p>
               <p className="text-xs text-slate-500 dark:text-slate-400">
-                Administrator
+                {restaurantstore?.name || "Administrator"}
               </p>
             </div>
             <ChevronDown className="w-4 h-4 text-slate-400" />

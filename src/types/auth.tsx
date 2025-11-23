@@ -11,3 +11,8 @@ export interface CreateOwnerAccountResponseData {
   email: string;
   contact_no: string;
 }
+
+export interface CreateOwnerLastActivityRes {
+  restaurant_pid: string;
+  owner_pid: string;
+}

@@ -68,6 +68,7 @@ const FoodType = [
 import type { UseFormSetValue, UseFormWatch } from "react-hook-form";
 import { unixToString } from "../../../utils/utils";
 import { restaurantStore } from "../../../store/user_store";
+import type { CreateOwnerLastActivityRes } from "../../../types/auth";
 
 // Add this interface near your other types
 interface TagsInputProps {
@@ -195,13 +196,20 @@ function Restaurants() {
     }
   };
 
-  const switchRestaurant = (restaurant: ListRestaurantsRes) => {
+  const switchRestaurant = async (restaurant: ListRestaurantsRes) => {
     localStorage.setItem(LocalStorageKey.CurrentRestaurant, restaurant.pid);
     const restoInterface: restaurantInterface = {
       id: restaurant.pid,
       name: restaurant.name,
     };
     setRestoStore(restoInterface);
+    const requestData = { restaurant_pid: restaurant.pid };
+    console.log("RequestData : ", requestData);
+    const res = await postApi<CreateOwnerLastActivityRes>(
+      EndPoint.CreateOwnerLastActivity,
+      requestData,
+    );
+    toast.success(res.message);
     navigate("/dashboard");
   };
 
@@ -536,7 +544,7 @@ function Restaurants() {
                             className={action_button}
                             onClick={(e) => {
                               e.stopPropagation();
-                              switchRestaurant(restaurant.pid);
+                              switchRestaurant(restaurant);
                             }}
                           >
                             <span>Switch</span>
