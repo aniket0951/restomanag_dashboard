@@ -129,9 +129,19 @@ function Categories() {
       ) : (
         <div className={parent_div}>
           <div className="p-3.5">
-            <h1 className="text-white dark:text-white font-semibold">
-              Menu Categories
-            </h1>
+            <div className="flex justify-between">
+              <h1 className="text-white dark:text-white font-semibold">
+                Menu Categories
+              </h1>
+              <button
+                className={`${rounded_button} cursor-pointer`}
+                onClick={() => navigate("/dashboard/categories/create")}
+              >
+                <Plus className="w-4 h-4" />
+                <span className="text-sm font-medium">Add New</span>
+              </button>
+            </div>
+
             <span className="text-sm font-medium dark:text-red-300">
               Data not available
             </span>

@@ -2,12 +2,13 @@ import toast from "react-hot-toast";
 import type {
   CreateMenuItemsRes,
   ListMenuCategoryNameByRestaurantRes,
+  UpdateMenuItemsRes,
 } from "../../../types/restaurant";
 import { getApi, postApi } from "../../../utils/api";
 import { LocalStorageKey } from "../../../utils/constants";
 import { EndPoint } from "../../../utils/endpoints";
 import { useForm } from "react-hook-form";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { form_class } from "../../../utils/csstags";
 import { useEffect, useState } from "react";
 
@@ -17,7 +18,11 @@ const form_label: string =
 const form_input: string =
   "block w-full mt-2 rounded-md bg-white/5 px-3 py-2 text-base text-gray-400 dark:text-gray-400 outline-1 outline-white/10 placeholder:text-gray-400 focus:outline-2 focus:outline-slate-200/50 sm:text-sm";
 
+const create_update_button: string =
+  "flex justify-center items-center py-2 px-4 bg-gradient-to-r from-blue-500 to-purple-600 text-white rounded-xl hover:from-purple-600 hover:to-blue-500 hover:shadow-lg active:scale-95 transition-all duration-300 mt-4 cursor-pointer w-sm text-center disabled:opacity-50 font-black";
+
 type CategoryMenuItemForm = {
+  pid: string;
   name: string;
   description: string;
   price: number;
@@ -33,6 +38,9 @@ function CreateMenuItems() {
   const [menuCategoryNames, setMenuCategoryNames] = useState<
     ListMenuCategoryNameByRestaurantRes[]
   >([]);
+  const [itemMenuForUpdate, setItemMenuForUpdate] = useState(false);
+  const { state } = useLocation();
+  const stateMenu = state?.menu;
 
   const {
     register,
@@ -61,8 +69,21 @@ function CreateMenuItems() {
   };
 
   useEffect(() => {
+    if (stateMenu != null && stateMenu != "undefined") {
+      console.log("Having value...", stateMenu);
+      setValue("category_pid", stateMenu.category_pid);
+      setValue("name", stateMenu.name);
+      setValue("description", stateMenu.description);
+      setValue("price", stateMenu.price);
+      setValue("is_veg", stateMenu.is_veg);
+      setValue("is_available", stateMenu.is_available);
+      setValue("preparation_time", stateMenu.preparation_time);
+      setValue("restaurant_pid", stateMenu.restaurant_pid);
+      setValue("pid", stateMenu.pid);
+      setItemMenuForUpdate(true);
+    }
     fetchListMenuCategoryNameByRestaurant();
-  }, []);
+  }, [stateMenu]);
 
   const fetchListMenuCategoryNameByRestaurant = async () => {
     try {
@@ -73,17 +94,37 @@ function CreateMenuItems() {
         EndPoint.ListMenuCategoryNameByRestaurant + restaurantPID;
 
       const res = await getApi<ListMenuCategoryNameByRestaurantRes[]>(endpoint);
-
       setMenuCategoryNames(res.data);
     } catch {
       console.log("Error ");
     }
   };
 
+  const updateMenuItems = async (data: CategoryMenuItemForm) => {
+    try {
+      const res = await postApi<UpdateMenuItemsRes>(
+        EndPoint.UpdateMenuItems,
+        data,
+      );
+      if (res.status_code === 200) {
+        toast.success(res.status);
+        naviaget("/dashboard/menu");
+      } else {
+        toast.error(res.message);
+      }
+    } catch {
+      console.log("Error");
+    }
+  };
+
   return (
     <div className="space-y-6">
       <form
-        onSubmit={handleSubmit(onSubmit)}
+        onSubmit={
+          itemMenuForUpdate
+            ? handleSubmit(updateMenuItems)
+            : handleSubmit(onSubmit)
+        }
         className={`${form_class} max-w-3xl mx-auto`}
       >
         <div>
@@ -237,17 +278,23 @@ function CreateMenuItems() {
 
         {/* Submit Button */}
         <div className="flex justify-center">
-          <button
-            type="submit"
-            disabled={isSubmitting}
-            className="flex justify-center items-center py-2 px-4
-              bg-gradient-to-r from-blue-500 to-purple-600 text-white rounded-xl
-              hover:from-purple-600 hover:to-blue-500 hover:shadow-lg
-              active:scale-95 transition-all duration-300 mt-4 cursor-pointer
-             w-sm text-center disabled:opacity-50 font-black"
-          >
-            {isSubmitting ? "Creating..." : "Create"}
-          </button>
+          {itemMenuForUpdate ? (
+            <button
+              type="submit"
+              disabled={isSubmitting}
+              className={create_update_button}
+            >
+              {isSubmitting ? "Updating..." : "Update"}
+            </button>
+          ) : (
+            <button
+              type="submit"
+              disabled={isSubmitting}
+              className={create_update_button}
+            >
+              {isSubmitting ? "Creating..." : "Create"}
+            </button>
+          )}
         </div>
       </form>
     </div>

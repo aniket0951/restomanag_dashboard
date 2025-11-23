@@ -21,4 +21,6 @@ export const EndPoint = {
   // MenuItems
   ListMenuItemsByRestaurant: `${MenuItems}`,
   CreateMenuItems: `${MenuItems}create`,
+  DeleteMenuItems: `${MenuItems}delete/`,
+  UpdateMenuItems: `${MenuItems}update`,
 };
