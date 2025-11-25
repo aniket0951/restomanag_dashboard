@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from "react";
-import { Plus } from "lucide-react";
+import { PencilIcon, Plus, Trash2 } from "lucide-react";
 import { rounded_button } from "../../../utils/csstags";
 import type { ListCategoriesRes } from "../../../types/restaurant";
 import { getApi } from "../../../utils/api";
@@ -16,10 +16,15 @@ const td_span: string =
 const parent_div: string =
   "bg-white/80 bg-slate-800 dark:bg-slate-800 rounded-xl backdrop-blur-xl overflow-hidden w-full p-2 m-3 border border-slate-200/50 dark:border-slate-700/50";
 
+const action_button: string =
+  "relative w-full p-1 rounded-xl text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors";
+
 function Categories() {
   const navigate = useNavigate();
   const [categories, setCategories] = useState<ListCategoriesRes[]>([]);
   const [page, setPage] = useState(1);
+  const [selectedItemId, setSelectedItemId] = useState("");
+  const [showConfirm, setShowConfirm] = useState(false);
 
   const fetchCategories = useCallback(async () => {
     try {
@@ -77,6 +82,7 @@ function Categories() {
                   <th className={th_class}> Category Name </th>
                   <th className={th_class}> Description </th>
                   <th className={th_class}> Created At</th>
+                  <th className={th_class}> Action</th>
                 </tr>
               </thead>
               <tbody>
@@ -100,6 +106,33 @@ function Categories() {
                       <span className={td_span}>
                         {unixToString(restaurant.created_at)}
                       </span>
+                    </td>
+                    <td className={td}>
+                      <div className="flex  items-center">
+                        <button
+                          className={action_button}
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            // editMenuItem(menu);
+                          }}
+                        >
+                          <span className="flex  justify-center cursor-pointer">
+                            <PencilIcon className="w-5 h-5 text-green-600" />
+                          </span>
+                        </button>
+                        <button
+                          className={action_button}
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setSelectedItemId(restaurant.pid);
+                            setShowConfirm(true);
+                          }}
+                        >
+                          <span className="flex  justify-center cursor-pointer">
+                            <Trash2 className="w-5 h-5 text-red-500" />
+                          </span>
+                        </button>
+                      </div>
                     </td>
                   </tr>
                 ))}
@@ -125,6 +158,35 @@ function Categories() {
               Next
             </button>
           </div>
+          {showConfirm && (
+            <div className="fixed inset-0 flex items-center justify-center bg-black/50">
+              <div className="bg-white p-6 rounded-xl shadow-xl w-80">
+                <h3 className="text-lg font-semibold mb-4">Confirm Delete</h3>
+                <p className="text-sm text-gray-600 mb-6">
+                  Are you sure you want to delete this item?
+                </p>
+
+                <div className="flex justify-end space-x-3">
+                  <button
+                    onClick={() => setShowConfirm(false)}
+                    className="px-4 py-2 rounded-lg bg-gray-200 hover:bg-gray-300"
+                  >
+                    Cancel
+                  </button>
+
+                  <button
+                    onClick={() => {
+                      // deleteMenuItem(selectedItemId);
+                      setShowConfirm(false);
+                    }}
+                    className="px-4 py-2 rounded-lg bg-red-500 text-white hover:bg-red-600"
+                  >
+                    Delete
+                  </button>
+                </div>
+              </div>
+            </div>
+          )}
         </div>
       ) : (
         <div className={parent_div}>
