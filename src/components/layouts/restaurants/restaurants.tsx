@@ -204,7 +204,6 @@ function Restaurants() {
     };
     setRestoStore(restoInterface);
     const requestData = { restaurant_pid: restaurant.pid };
-    console.log("RequestData : ", requestData);
     const res = await postApi<CreateOwnerLastActivityRes>(
       EndPoint.CreateOwnerLastActivity,
       requestData,
