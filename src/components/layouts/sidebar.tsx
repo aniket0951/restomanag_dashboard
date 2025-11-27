@@ -9,7 +9,7 @@ import {
   Hotel,
 } from "lucide-react";
 import { useState } from "react";
-import { useUserStore } from "../../store/user_store";
+import { useUserStore, restaurantStore } from "../../store/user_store";
 import { useNavigate, useLocation } from "react-router-dom";
 
 const menuItems = [
@@ -98,7 +98,7 @@ type SideBarProps = {
 function SideBar({
   collapsed,
   onToggle: _onToggle, // eslint-disable-line @typescript-eslint/no-unused-vars
-  currentPage,
+  currentPage: _currentPage, // eslint-disable-line @typescript-eslint/no-unused-vars
   onPageChange: _onPageChange, // eslint-disable-line @typescript-eslint/no-unused-vars
 }: SideBarProps) {
   const navigate = useNavigate();
@@ -115,12 +115,13 @@ function SideBar({
     setexpanedItem(newExpanded);
   };
   const user = useUserStore((state) => state.user);
+  const restaurantstore = restaurantStore((state) => state.restaurant);
 
   return (
     <div
       className={`${collapsed ? "w-20" : "w-60"} transition-all duration-300 ease-in-out bg-white/80 dark:bg-slate-900/80
       backdrop-blur-xl border-r border-slate-200/50 dark:border-slate-700/50 flex flex-col
-      relative z-10f `}
+      relative z-10f`}
     >
       {/* LOGO */}
 
@@ -229,7 +230,7 @@ function SideBar({
                     {user?.name || "Unknow"}
                   </p>
                   <p className="text-xs text-slate-500 dark:text-slate-400 truncate">
-                    Adminoistrator
+                    {restaurantstore?.name || "Adminoistrator"}
                   </p>
                 </div>
               </div>

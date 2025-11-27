@@ -49,6 +49,7 @@ function App() {
           />
           <Route path="menu" element={<Menus />} />
           <Route path="menu/create" element={<CreateMenuItems />} />
+          <Route path="menu/create/:id" element={<CreateMenuItems />} />
         </Route>
       </Routes>
       <Toaster position="top-right" />

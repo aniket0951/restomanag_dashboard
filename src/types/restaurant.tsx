@@ -79,3 +79,17 @@ export interface ListMenuCategoryNameByRestaurantRes {
   name: string;
   pid: string;
 }
+
+export interface UpdateMenuItemsRes {
+  pid: string;
+  name: string;
+  description: string;
+  price: number;
+  is_veg: boolean;
+  is_available: boolean;
+  preparation_time: number;
+  restaurant_pid: string;
+  category_pid: string;
+  category_name: string;
+  created_at: number;
+}

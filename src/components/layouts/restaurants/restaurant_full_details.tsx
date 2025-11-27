@@ -5,6 +5,7 @@ import { getApi } from "../../../utils/api";
 import type { GetRestaurantRes } from "../../../types/restaurant";
 import { EndPoint } from "../../../utils/endpoints";
 import Categories from "./categories";
+import Menus from "./menus";
 const owner_details_h3: string =
   "text-gray-400 dark:text-gray-400 font-medium font-sans";
 
@@ -96,6 +97,9 @@ function RestaurantFullDetails() {
       </div>
       {/* Categories */}
       <Categories />
+
+      {/*Menus*/}
+      <Menus />
     </div>
   );
 }
