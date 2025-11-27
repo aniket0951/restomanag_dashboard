@@ -2,11 +2,12 @@ import { useCallback, useEffect, useState } from "react";
 import { PencilIcon, Plus, Trash2 } from "lucide-react";
 import { rounded_button } from "../../../utils/csstags";
 import type { ListCategoriesRes } from "../../../types/restaurant";
-import { getApi } from "../../../utils/api";
+import { getApi, postApi } from "../../../utils/api";
 import { EndPoint } from "../../../utils/endpoints";
 import { LocalStorageKey } from "../../../utils/constants";
 import { useNavigate } from "react-router-dom";
 import { unixToString } from "../../../utils/utils";
+import toast from "react-hot-toast";
 
 const th_class: string =
   "text-left p-4 text-sm font-semibold text-white border-r border-slate-200 dark:border-slate-700";
@@ -51,6 +52,25 @@ function Categories() {
 
   const fecthPreviousCategory = () => {
     setPage((p) => Math.max(p - 1, 1));
+  };
+
+  const deleteMenuItem = async (menuID: string) => {
+    try {
+      const res = await postApi(EndPoint.DeleteCategory + menuID);
+      toast.success(res.message);
+      setPage(1);
+      fetchCategories();
+    } catch {
+      console.log();
+    }
+  };
+
+  const editMenuItem = (item: ListCategoriesRes) => {
+    navigate("/dashboard/categories/create", {
+      state: {
+        category: item,
+      },
+    });
   };
 
   return (
@@ -108,15 +128,15 @@ function Categories() {
                       </span>
                     </td>
                     <td className={td}>
-                      <div className="flex  items-center">
+                      <div className="flex items-center">
                         <button
                           className={action_button}
                           onClick={(e) => {
                             e.stopPropagation();
-                            // editMenuItem(menu);
+                            editMenuItem(restaurant);
                           }}
                         >
-                          <span className="flex  justify-center cursor-pointer">
+                          <span className="flex justify-center cursor-pointer">
                             <PencilIcon className="w-5 h-5 text-green-600" />
                           </span>
                         </button>
@@ -128,7 +148,7 @@ function Categories() {
                             setShowConfirm(true);
                           }}
                         >
-                          <span className="flex  justify-center cursor-pointer">
+                          <span className="flex justify-center cursor-pointer">
                             <Trash2 className="w-5 h-5 text-red-500" />
                           </span>
                         </button>
@@ -141,7 +161,7 @@ function Categories() {
           </div>
           <div className="flex items-center justify-end p-1 border-t border-slate-200/50 dark:border-slate-700/50">
             <span className="text-sm text-slate-600 dark:text-slate-300 m-3">
-              Page {page}
+              {page}
             </span>
             <button
               disabled={page === 1}
@@ -176,7 +196,7 @@ function Categories() {
 
                   <button
                     onClick={() => {
-                      // deleteMenuItem(selectedItemId);
+                      deleteMenuItem(selectedItemId);
                       setShowConfirm(false);
                     }}
                     className="px-4 py-2 rounded-lg bg-red-500 text-white hover:bg-red-600"

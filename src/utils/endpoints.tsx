@@ -19,6 +19,8 @@ export const EndPoint = {
   ListMenuCategoriesByRestaurant: `${Categories}`,
   CreateMenuCategory: `${Categories}create`,
   ListMenuCategoryNameByRestaurant: `${Categories}name/`,
+  DeleteCategory: `${Categories}delete/`,
+  UpdateCategory: `${Categories}update`,
 
   // MenuItems
   ListMenuItemsByRestaurant: `${MenuItems}`,

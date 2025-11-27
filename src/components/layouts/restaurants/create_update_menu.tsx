@@ -83,7 +83,7 @@ function CreateMenuItems() {
       setItemMenuForUpdate(true);
     }
     fetchListMenuCategoryNameByRestaurant();
-  }, [stateMenu]);
+  }, [stateMenu, setValue]);
 
   const fetchListMenuCategoryNameByRestaurant = async () => {
     try {
