@@ -1,13 +1,12 @@
 import { useEffect, useState } from "react";
-import { LocalStorageKey } from "../../../utils/constants";
-import { getApi, postApi } from "../../../utils/api";
-import type { ListMenuItemsRes } from "../../../types/restaurant";
+import { getApi } from "../../../utils/api";
+import type { ListRestaurantTablesRes } from "../../../types/restaurant";
 import { EndPoint } from "../../../utils/endpoints";
 import { rounded_button } from "../../../utils/csstags";
 import { Trash2, Plus, PencilIcon } from "lucide-react";
 import { useNavigate } from "react-router-dom";
-import toast from "react-hot-toast";
 import { unixToString } from "../../../utils/utils";
+import { LocalStorageKey } from "../../../utils/constants";
 
 const th_class: string =
   "text-left p-4 text-sm font-semibold text-white border-r border-slate-200 dark:border-slate-700";
@@ -20,31 +19,14 @@ const parent_div: string =
 const action_button: string =
   "relative w-full p-1 rounded-xl text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors";
 
-function Menus() {
-  const [menuItems, setMenuItems] = useState<ListMenuItemsRes[]>([]);
+function Tables() {
+  const [restauranTables, setRestauranTables] = useState<
+    ListRestaurantTablesRes[]
+  >([]);
   const [page, setPage] = useState(1);
   const navigate = useNavigate();
   const [showConfirm, setShowConfirm] = useState(false);
   const [selectedItemId, setSelectedItemId] = useState("");
-
-  useEffect(() => {
-    fetchMenuItemsByRestaurant();
-  }, [page]);
-
-  const fetchMenuItemsByRestaurant = async () => {
-    try {
-      const restaurantPID = localStorage.getItem(
-        LocalStorageKey.CurrentRestaurant,
-      );
-      const endpoint: string =
-        EndPoint.ListMenuItemsByRestaurant + restaurantPID + "?page=" + page;
-      const res = await getApi<ListMenuItemsRes[]>(endpoint);
-
-      setMenuItems(res.data);
-    } catch {
-      console.log("");
-    }
-  };
 
   const fecthNextCategory = () => setPage((p) => p + 1);
 
@@ -52,33 +34,33 @@ function Menus() {
     setPage((p) => Math.max(p - 1, 1));
   };
 
-  const deleteMenuItem = async (itemPID: string) => {
-    try {
-      const res = await postApi(EndPoint.DeleteMenuItems + itemPID);
-      if (res.status_code === 200) {
-        toast.success(res.message);
-        fetchMenuItemsByRestaurant();
-      } else {
-        toast.error(res.message);
-      }
-    } catch {
-      console.log("");
-    }
-  };
+  useEffect(() => {
+    fetchRestaurantTables();
+  }, [page]);
 
-  const editMenuItem = (menu: ListMenuItemsRes) => {
-    navigate("/dashboard/menu/create", { state: { menu } });
+  const fetchRestaurantTables = async () => {
+    try {
+      const restaurantPID = localStorage.getItem(
+        LocalStorageKey.CurrentRestaurant,
+      );
+      const res = await getApi<ListRestaurantTablesRes[]>(
+        EndPoint.ListRestaurantTables + restaurantPID,
+      );
+      setRestauranTables(res.data);
+    } catch {
+      console.log();
+    }
   };
 
   return (
     <>
-      {menuItems.length > 0 ? (
+      {restauranTables.length > 0 ? (
         <div className={parent_div}>
           <div className="p-6 border-b border-slate-200/50 dark:border-slate-700/50">
             <div className="flex items-center justify-between">
               <div>
                 <h3 className="text-lg font-bold text-slate-800 dark:text-white">
-                  Menu Items
+                  Restaurant Tables
                 </h3>
               </div>
               <button
@@ -96,19 +78,14 @@ function Menus() {
               <thead className="border-b border-slate-300 dark:border-slate-700">
                 <tr>
                   <th className={th_class}>ID</th>
-                  <th className={th_class}> Menu Name </th>
-                  <th className={th_class}> Description </th>
-                  <th className={th_class}> Category </th>
-                  <th className={th_class}> Price </th>
-                  <th className={th_class}> Is Veg </th>
-                  <th className={th_class}> Is Available </th>
-                  <th className={th_class}> Preparation Time</th>
+                  <th className={th_class}> Table Number </th>
+                  <th className={th_class}> Status </th>
                   <th className={th_class}> Created At</th>
                   <th className={th_class}> Action </th>
                 </tr>
               </thead>
               <tbody>
-                {menuItems.map((menu, index) => (
+                {restauranTables.map((menu, index) => (
                   <tr
                     className="cursor-pointer border-b border-slate-200/50 dark:border-slate-700/50
           hover:bg-slate-50/50 dark:hover:bg-slate-700/20 transition-colors"
@@ -119,66 +96,40 @@ function Menus() {
                     </td>
                     <td className={td}>
                       <span className={td_span}>
-                        {menu?.name ? menu.name : "NA"}
+                        {menu?.number ? `Table_${menu.number}` : "NA"}
                       </span>
                     </td>
 
                     <td className={td}>
-                      <span className={td_span}>
-                        {menu?.description ? menu.description : "NA"}
+                      <span
+                        className={`${td_span} ${
+                          menu?.status === "available"
+                            ? "text-red-700"
+                            : menu?.status === "occupied"
+                              ? "text-red-600"
+                              : "text-slate-500"
+                        }`}
+                      >
+                        {menu?.status ? menu.status : "NA"}
                       </span>
                     </td>
                     <td className={td}>
                       <span className={td_span}>
-                        {menu?.category_name ? menu.category_name : "NA"}
+                        {menu?.status ? unixToString(menu.created_at) : "NA"}
                       </span>
                     </td>
+
                     <td className={td}>
-                      <span className={td_span}>
-                        {menu?.price ? `₹ ${menu.price}` : "NA"}
-                      </span>
-                    </td>
-                    <td className={td}>
-                      <span className={td_span}>
-                        {menu?.is_veg === true
-                          ? "Veg"
-                          : menu?.is_veg === false
-                            ? "Non Veg"
-                            : "NA"}
-                      </span>
-                    </td>
-                    <td className={td}>
-                      <span className={td_span}>
-                        {menu?.is_available === true
-                          ? "Yes"
-                          : menu?.is_available === false
-                            ? "No"
-                            : "NA"}
-                      </span>
-                    </td>
-                    <td className={td}>
-                      <span className={td_span}>
-                        {menu?.preparation_time
-                          ? `${menu.preparation_time} Min`
-                          : "NA"}
-                      </span>
-                    </td>
-                    <td className={td}>
-                      <span className={td_span}>
-                        {unixToString(menu.created_at)}
-                      </span>
-                    </td>
-                    <td className={td}>
-                      <div className="flex  items-center">
+                      <div className="flex">
                         <button
                           className={action_button}
                           onClick={(e) => {
                             e.stopPropagation();
-                            editMenuItem(menu);
+                            // editMenuItem(menu);
                           }}
                         >
                           <span className="flex  justify-center cursor-pointer">
-                            <PencilIcon className="w-5 h-5 text-green-600" />
+                            <PencilIcon className="w-4 h-5 text-green-600" />
                           </span>
                         </button>
                         <button
@@ -190,7 +141,7 @@ function Menus() {
                           }}
                         >
                           <span className="flex  justify-center cursor-pointer">
-                            <Trash2 className="w-5 h-5 text-red-500" />
+                            <Trash2 className="w-4 h-5 text-red-500" />
                           </span>
                         </button>
                       </div>
@@ -237,7 +188,7 @@ function Menus() {
 
                   <button
                     onClick={() => {
-                      deleteMenuItem(selectedItemId);
+                      // deleteMenuItem(selectedItemId);
                       setShowConfirm(false);
                     }}
                     className="px-4 py-2 rounded-lg bg-red-500 text-white hover:bg-red-600"
@@ -254,7 +205,7 @@ function Menus() {
           <div className="p-3.5">
             <div className="flex items-center justify-between">
               <h1 className="text-white dark:text-white font-semibold">
-                Menu Items
+                Restaurant Tables
               </h1>
               <button
                 className={`${rounded_button} cursor-pointer`}
@@ -274,4 +225,4 @@ function Menus() {
   );
 }
 
-export default Menus;
+export default Tables;

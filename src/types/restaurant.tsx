@@ -93,3 +93,10 @@ export interface UpdateMenuItemsRes {
   category_name: string;
   created_at: number;
 }
+
+export interface ListRestaurantTablesRes {
+  pid: string;
+  number: string;
+  status: string;
+  created_at: number;
+}
