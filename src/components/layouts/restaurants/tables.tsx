@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { getApi } from "../../../utils/api";
+import { getApi, postApi } from "../../../utils/api";
 import type { ListRestaurantTablesRes } from "../../../types/restaurant";
 import { EndPoint } from "../../../utils/endpoints";
 import { rounded_button } from "../../../utils/csstags";
@@ -7,6 +7,7 @@ import { Trash2, Plus, PencilIcon } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { unixToString } from "../../../utils/utils";
 import { LocalStorageKey } from "../../../utils/constants";
+import toast from "react-hot-toast/headless";
 
 const th_class: string =
   "text-left p-4 text-sm font-semibold text-white border-r border-slate-200 dark:border-slate-700";
@@ -17,7 +18,7 @@ const parent_div: string =
   "bg-white/80 bg-slate-800 dark:bg-slate-800 rounded-xl backdrop-blur-xl overflow-hidden w-full p-2 m-3 border border-slate-200/50 dark:border-slate-700/50";
 
 const action_button: string =
-  "relative w-full p-1 rounded-xl text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors";
+  "relative w-full  rounded-xl text-slate-600 dark:text-slate-300  transition-colors";
 
 function Tables() {
   const [restauranTables, setRestauranTables] = useState<
@@ -52,6 +53,26 @@ function Tables() {
     }
   };
 
+  const editMenuItem = async (currentTable: ListRestaurantTablesRes) => {
+    navigate("/dashboard/table/create", {
+      state: { currentTable: currentTable },
+    });
+  };
+
+  const deleteTable = async (tableID: string) => {
+    try {
+      const res = await postApi(EndPoint.DeleteRestaurantTable + tableID);
+      if (res.status_code == 200) {
+        toast.success(res.message);
+        fetchRestaurantTables();
+      } else {
+        toast.error(res.message);
+      }
+    } catch {
+      console.log();
+    }
+  };
+
   return (
     <>
       {restauranTables.length > 0 ? (
@@ -65,7 +86,7 @@ function Tables() {
               </div>
               <button
                 className={`${rounded_button} cursor-pointer`}
-                onClick={() => navigate("/dashboard/menu/create")}
+                onClick={() => navigate("/dashboard/table/create")}
               >
                 <Plus className="w-4 h-4" />
                 <span className="text-sm font-medium">Add New</span>
@@ -102,13 +123,13 @@ function Tables() {
 
                     <td className={td}>
                       <span
-                        className={`${td_span} ${
+                        className={`${
                           menu?.status === "available"
-                            ? "text-red-700"
+                            ? "text-green-600 dark:text-green-600"
                             : menu?.status === "occupied"
                               ? "text-red-600"
-                              : "text-slate-500"
-                        }`}
+                              : ""
+                        } capitalize ${td_span}`}
                       >
                         {menu?.status ? menu.status : "NA"}
                       </span>
@@ -125,7 +146,7 @@ function Tables() {
                           className={action_button}
                           onClick={(e) => {
                             e.stopPropagation();
-                            // editMenuItem(menu);
+                            editMenuItem(menu);
                           }}
                         >
                           <span className="flex  justify-center cursor-pointer">
@@ -140,7 +161,7 @@ function Tables() {
                             setShowConfirm(true);
                           }}
                         >
-                          <span className="flex  justify-center cursor-pointer">
+                          <span className="flex w-10 justify-center cursor-pointer">
                             <Trash2 className="w-4 h-5 text-red-500" />
                           </span>
                         </button>
@@ -175,7 +196,7 @@ function Tables() {
               <div className="bg-white p-6 rounded-xl shadow-xl w-80">
                 <h3 className="text-lg font-semibold mb-4">Confirm Delete</h3>
                 <p className="text-sm text-gray-600 mb-6">
-                  Are you sure you want to delete this item?
+                  Are you sure you want to delete this table?
                 </p>
 
                 <div className="flex justify-end space-x-3">
@@ -188,7 +209,7 @@ function Tables() {
 
                   <button
                     onClick={() => {
-                      // deleteMenuItem(selectedItemId);
+                      deleteTable(selectedItemId);
                       setShowConfirm(false);
                     }}
                     className="px-4 py-2 rounded-lg bg-red-500 text-white hover:bg-red-600"
@@ -209,7 +230,7 @@ function Tables() {
               </h1>
               <button
                 className={`${rounded_button} cursor-pointer`}
-                onClick={() => navigate("/dashboard/menu/create")}
+                onClick={() => navigate("/dashboard/table/create")}
               >
                 <Plus className="w-4 h-4" />
                 <span className="text-sm font-medium">Add New</span>

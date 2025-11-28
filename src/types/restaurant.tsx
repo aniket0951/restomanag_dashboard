@@ -100,3 +100,9 @@ export interface ListRestaurantTablesRes {
   status: string;
   created_at: number;
 }
+
+export interface CreateRestaurantTableRes {
+  pid: string;
+  number: string;
+  status: string;
+}

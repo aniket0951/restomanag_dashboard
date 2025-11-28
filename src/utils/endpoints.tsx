@@ -31,4 +31,7 @@ export const EndPoint = {
 
   // Tables
   ListRestaurantTables: `${Tables}/`,
+  DeleteRestaurantTable: `${Tables}/delete/`,
+  CreateRestaurantTable: `${Tables}/create`,
+  UpdateRestaurantTable: `${Tables}/update`,
 };
