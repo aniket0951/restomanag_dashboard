@@ -40,7 +40,7 @@ const menuItems = [
   {
     id: "users",
     icon: Users,
-    lable: "Users",
+    lable: "Customers",
     count: "1.4k",
     link: "/test",
     submenu: [
@@ -59,7 +59,7 @@ const menuItems = [
   {
     id: "student",
     icon: School,
-    lable: "Student",
+    lable: "Employees",
     link: "/test",
   },
   {
@@ -83,6 +83,11 @@ const menuItems = [
         id: "menu",
         label: "Menu",
         link: "/dashboard/menu",
+      },
+      {
+        id: "tables",
+        label: "Tables",
+        link: "/dashboard/table",
       },
     ],
   },
