@@ -100,6 +100,7 @@ function Menus() {
                   <th className={th_class}> Description </th>
                   <th className={th_class}> Category </th>
                   <th className={th_class}> Price </th>
+                  <th className={th_class}> Half Price </th>
                   <th className={th_class}> Is Veg </th>
                   <th className={th_class}> Is Available </th>
                   <th className={th_class}> Preparation Time</th>
@@ -118,7 +119,7 @@ function Menus() {
                       <span className={td_span}>{index + 1}</span>
                     </td>
                     <td className={td}>
-                      <span className={td_span}>
+                      <span className={`${td_span} capitalize`}>
                         {menu?.name ? menu.name : "NA"}
                       </span>
                     </td>
@@ -140,6 +141,11 @@ function Menus() {
                     </td>
                     <td className={td}>
                       <span className={td_span}>
+                        {menu?.half_price ? `₹ ${menu.half_price}` : "0.0"}
+                      </span>
+                    </td>
+                    <td className={td}>
+                      <span className={td_span}>
                         {menu?.is_veg === true
                           ? "Veg"
                           : menu?.is_veg === false
@@ -148,11 +154,17 @@ function Menus() {
                       </span>
                     </td>
                     <td className={td}>
-                      <span className={td_span}>
+                      <span
+                        className={`${
+                          menu?.is_available === true
+                            ? "text-green-600 dark:text-green-600"
+                            : "text-red-600 dark:text-red-600"
+                        } capitalize ${td_span} `}
+                      >
                         {menu?.is_available === true
-                          ? "Yes"
+                          ? "Available"
                           : menu?.is_available === false
-                            ? "No"
+                            ? "Not Available"
                             : "NA"}
                       </span>
                     </td>

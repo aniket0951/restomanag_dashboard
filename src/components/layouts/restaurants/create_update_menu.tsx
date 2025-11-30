@@ -26,6 +26,7 @@ type CategoryMenuItemForm = {
   name: string;
   description: string;
   price: number;
+  half_price: number;
   is_veg: boolean;
   is_available: boolean;
   preparation_time: number;
@@ -79,6 +80,7 @@ function CreateMenuItems() {
       setValue("is_available", stateMenu.is_available);
       setValue("preparation_time", stateMenu.preparation_time);
       setValue("restaurant_pid", stateMenu.restaurant_pid);
+      setValue("half_price", stateMenu.half_price);
       setValue("pid", stateMenu.pid);
       setItemMenuForUpdate(true);
     }
@@ -168,6 +170,23 @@ function CreateMenuItems() {
               <input
                 {...register("price", {
                   required: "Price is required",
+                  valueAsNumber: true,
+                })}
+                type="number"
+                className={form_input}
+                placeholder="₹ 123"
+              />
+              {errors.price && (
+                <p className="text-red-400 text-xs mt-1">
+                  {errors.price.message}
+                </p>
+              )}
+            </div>
+            <div className="relative z-0 p-3">
+              <label className={form_label}>Half Price</label>
+              <input
+                {...register("half_price", {
+                  required: "Half-Price is required",
                   valueAsNumber: true,
                 })}
                 type="number"

@@ -55,6 +55,7 @@ export interface ListMenuItemsRes {
   name: string;
   description: string;
   price: number;
+  half_price: number;
   is_veg: boolean;
   is_available: boolean;
   preparation_time: number;
@@ -69,6 +70,7 @@ export interface CreateMenuItemsRes {
   name: string;
   description: string;
   price: number;
+  half_price: number;
   is_veg: boolean;
   is_available: boolean;
   preparation_time: number;
@@ -85,6 +87,7 @@ export interface UpdateMenuItemsRes {
   name: string;
   description: string;
   price: number;
+  half_price: number;
   is_veg: boolean;
   is_available: boolean;
   preparation_time: number;

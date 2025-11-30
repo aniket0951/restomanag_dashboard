@@ -116,7 +116,9 @@ function Categories() {
                       <span className={td_span}>{index + 1}</span>
                     </td>
                     <td className={td}>
-                      <span className={td_span}>{restaurant.name}</span>
+                      <span className={`${td_span} capitalize`}>
+                        {restaurant.name}
+                      </span>
                     </td>
 
                     <td className={td}>
