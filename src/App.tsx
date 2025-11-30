@@ -14,6 +14,8 @@ import Menus from "./components/layouts/restaurants/menus";
 import CreateMenuItems from "./components/layouts/restaurants/create_update_menu";
 import Tables from "./components/layouts/restaurants/tables";
 import CreateUpdateTable from "./components/layouts/restaurants/create_update_table";
+import Employees from "./components/layouts/empls/empls";
+import CreateUpdateEmpl from "./components/layouts/empls/create_update_empls";
 
 export function ProtectedRoute({ children }: { children: React.ReactNode }) {
   const token = localStorage.getItem("authToken");
@@ -54,6 +56,10 @@ function App() {
           <Route path="menu/create/:id" element={<CreateMenuItems />} />
           <Route path="table" element={<Tables />} />
           <Route path="table/create" element={<CreateUpdateTable />} />
+
+          {/* Empl */}
+          <Route path="empl" element={<Employees />} />
+          <Route path="empl/create" element={<CreateUpdateEmpl />} />
         </Route>
       </Routes>
       <Toaster position="top-right" />
