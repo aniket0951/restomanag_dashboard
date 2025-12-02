@@ -11,6 +11,7 @@ export const EndPoint = {
   CreateOwnerAccount: `${BASE_URL}/owner/`,
   OwnerAccountLogin: `${BASE_URL}/auth/login/owner`,
   CreateOwnerLastActivity: `${OwnerLastActivity}/create`,
+  GetOwnerLastActivity: `${OwnerLastActivity}/get`,
 
   // Restaurant
   CreateRestaurant: `${Restaurant}create`,

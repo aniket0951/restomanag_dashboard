@@ -213,7 +213,7 @@ function Restaurants() {
   };
 
   const displayRestaurantDetails = (restaurant_id: string) => {
-    localStorage.setItem(LocalStorageKey.CurrentRestaurant, restaurant_id);
+    // localStorage.setItem(LocalStorageKey.CurrentRestaurant, restaurant_id);
     navigate("/dashboard/restaurants/" + restaurant_id);
   };
 

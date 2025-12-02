@@ -1,12 +1,14 @@
 import { useEffect } from "react";
 
 import { useForm } from "react-hook-form";
-import { postApi } from "../utils/api";
+import { getApi, postApi } from "../utils/api";
 import { useNavigate, Link } from "react-router-dom";
 import type { LoginResponseData } from "../types/auth";
 import { EndPoint } from "../utils/endpoints";
-import { useUserStore } from "../store/user_store";
-import type { User as userInterface } from "../store/user_store";
+import { restaurantStore, useUserStore } from "../store/user_store";
+import type { Restaurant, User as userInterface } from "../store/user_store";
+import type { GetOwnerLastActivityRes } from "../types/restaurant";
+import { LocalStorageKey } from "../utils/constants";
 
 type LoginFormInputs = {
   email: string;
@@ -17,6 +19,7 @@ export default function Login() {
   const navigate = useNavigate();
   const ownerDashBord = "/dashboard";
   const setUserStore = useUserStore((state) => state.setUser);
+  const setRestaurantStore = restaurantStore((state) => state.setRestaurant);
 
   const {
     register,
@@ -46,10 +49,33 @@ export default function Login() {
       setUserStore(user);
 
       localStorage.setItem("authToken", res.data.access_token);
+      fetchOwnerLastActivity();
       navigate(ownerDashBord);
     } catch {
       // setError("email", { message: "Login failed, please try again" });
       // toast.error("Login failed, please try again");
+    }
+  };
+
+  const fetchOwnerLastActivity = async () => {
+    try {
+      const res = await getApi<GetOwnerLastActivityRes>(
+        EndPoint.GetOwnerLastActivity,
+      );
+      if (res.status_code === 200) {
+        const resto: Restaurant = {
+          id: res.data.restaurant_pid,
+          name: res.data.restaurant_name,
+        };
+
+        setRestaurantStore(resto);
+        localStorage.setItem(
+          LocalStorageKey.CurrentRestaurant,
+          res.data.restaurant_pid,
+        );
+      }
+    } catch {
+      console.log();
     }
   };
 
