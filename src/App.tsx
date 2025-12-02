@@ -16,6 +16,7 @@ import Tables from "./components/layouts/restaurants/tables";
 import CreateUpdateTable from "./components/layouts/restaurants/create_update_table";
 import Employees from "./components/layouts/empls/empls";
 import CreateUpdateEmpl from "./components/layouts/empls/create_update_empls";
+import Orders from "./components/layouts/orders/order";
 
 export function ProtectedRoute({ children }: { children: React.ReactNode }) {
   const token = localStorage.getItem("authToken");
@@ -60,6 +61,8 @@ function App() {
           {/* Empl */}
           <Route path="empl" element={<Employees />} />
           <Route path="empl/create" element={<CreateUpdateEmpl />} />
+          {/* Orders */}
+          <Route path="order" element={<Orders />} />
         </Route>
       </Routes>
       <Toaster position="top-right" />

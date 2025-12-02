@@ -66,7 +66,7 @@ const menuItems = [
     id: "orders",
     icon: ListOrdered,
     lable: "Orders",
-    link: "/test",
+    link: "/dashboard/order",
   },
   {
     id: "restaurants",
