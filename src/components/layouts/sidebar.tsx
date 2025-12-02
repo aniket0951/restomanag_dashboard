@@ -57,10 +57,10 @@ const menuItems = [
     ],
   },
   {
-    id: "student",
+    id: "employee",
     icon: School,
     lable: "Employees",
-    link: "/test",
+    link: "/dashboard/empl",
   },
   {
     id: "orders",

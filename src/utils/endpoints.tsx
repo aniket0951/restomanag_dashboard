@@ -5,11 +5,13 @@ const Categories = Restaurant + "menu/categories/";
 const MenuItems = Restaurant + "menu/item/";
 const OwnerLastActivity = BASE_URL + "/activity";
 const Tables = Restaurant + "table";
+const Empls = Restaurant + "empl";
 
 export const EndPoint = {
   CreateOwnerAccount: `${BASE_URL}/owner/`,
   OwnerAccountLogin: `${BASE_URL}/auth/login/owner`,
   CreateOwnerLastActivity: `${OwnerLastActivity}/create`,
+  GetOwnerLastActivity: `${OwnerLastActivity}/get`,
 
   // Restaurant
   CreateRestaurant: `${Restaurant}create`,
@@ -34,4 +36,10 @@ export const EndPoint = {
   DeleteRestaurantTable: `${Tables}/delete/`,
   CreateRestaurantTable: `${Tables}/create`,
   UpdateRestaurantTable: `${Tables}/update`,
+
+  // Employees
+  ListEmployeesByRestaurant: `${Empls}/list`,
+  DeleteEmpl: `${Empls}/delete/`,
+  CreateEmpl: `${Empls}/create`,
+  UpdateEmpl: `${Empls}/update`,
 };

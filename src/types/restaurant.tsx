@@ -109,3 +109,9 @@ export interface CreateRestaurantTableRes {
   number: string;
   status: string;
 }
+
+export interface GetOwnerLastActivityRes {
+  restaurant_pid: string;
+  owner_pid: string;
+  restaurant_name: string;
+}
