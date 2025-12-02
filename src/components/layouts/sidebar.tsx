@@ -9,7 +9,8 @@ import {
   Hotel,
 } from "lucide-react";
 import { useState } from "react";
-import { useUserStore } from "../../store/user_store";
+import { useUserStore, restaurantStore } from "../../store/user_store";
+import { useNavigate, useLocation } from "react-router-dom";
 
 const menuItems = [
   {
@@ -18,6 +19,7 @@ const menuItems = [
     lable: "Dashboard",
     active: true,
     badge: "new",
+    link: "/dashboard",
   },
   {
     id: "analytics",
@@ -26,47 +28,87 @@ const menuItems = [
     active: false,
     badge: "new",
     count: "23.4k",
+    link: "/test",
     submenu: [
       {
         id: "overview",
         label: "Overview",
+        link: "/test",
       },
     ],
   },
   {
     id: "users",
     icon: Users,
-    lable: "Users",
+    lable: "Customers",
     count: "1.4k",
+    link: "/test",
     submenu: [
       {
         id: "all-users",
         label: "All Users",
+        link: "/dashboard/categories",
       },
       {
         id: "role",
         label: "Role & Permission",
+        link: "/dashboard/categories",
       },
     ],
   },
   {
-    id: "student",
+    id: "employee",
     icon: School,
-    lable: "Student",
+    lable: "Employees",
+    link: "/dashboard/empl",
   },
   {
     id: "orders",
     icon: ListOrdered,
     lable: "Orders",
+    link: "/test",
   },
   {
     id: "restaurants",
     icon: Hotel,
     lable: "Restaurants",
+    link: "/dashboard/restaurants",
+    submenu: [
+      {
+        id: "category",
+        label: "Categories",
+        link: "/dashboard/categories",
+      },
+      {
+        id: "menu",
+        label: "Menu",
+        link: "/dashboard/menu",
+      },
+      {
+        id: "tables",
+        label: "Tables",
+        link: "/dashboard/table",
+      },
+    ],
   },
 ];
 
-function SideBar({ collapsed, onToggle, currentPage, onPageChange }) {
+type SideBarProps = {
+  collapsed: boolean;
+  onToggle: () => void;
+  currentPage: string;
+  onPageChange: (page: string) => void;
+};
+
+function SideBar({
+  collapsed,
+  onToggle: _onToggle, // eslint-disable-line @typescript-eslint/no-unused-vars
+  currentPage: _currentPage, // eslint-disable-line @typescript-eslint/no-unused-vars
+  onPageChange: _onPageChange, // eslint-disable-line @typescript-eslint/no-unused-vars
+}: SideBarProps) {
+  const navigate = useNavigate();
+  const location = useLocation();
+
   const [expanedItem, setexpanedItem] = useState(new Set(["analytics"]));
   const toggleExpanded = (itemid: string) => {
     const newExpanded = new Set(expanedItem);
@@ -78,12 +120,13 @@ function SideBar({ collapsed, onToggle, currentPage, onPageChange }) {
     setexpanedItem(newExpanded);
   };
   const user = useUserStore((state) => state.user);
+  const restaurantstore = restaurantStore((state) => state.restaurant);
 
   return (
     <div
       className={`${collapsed ? "w-20" : "w-60"} transition-all duration-300 ease-in-out bg-white/80 dark:bg-slate-900/80
       backdrop-blur-xl border-r border-slate-200/50 dark:border-slate-700/50 flex flex-col
-      relative z-10f `}
+      relative z-10f`}
     >
       {/* LOGO */}
 
@@ -122,15 +165,16 @@ function SideBar({ collapsed, onToggle, currentPage, onPageChange }) {
                 <button
                   className={`w-full flex items-center justify-between p-3 rounded-xl transition-all duration-200
                     ${
-                      currentPage === item.id || item.active
+                      location.pathname === item.link
                         ? "bg-gradient-to-r from-blue-500 to-purple-600 text-white shadow-lg shadow-blue-500/25"
                         : "text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800/50"
                     }`}
                   onClick={() => {
                     if (item.submenu) {
                       toggleExpanded(item.id);
-                    } else {
-                      onPageChange(item.id);
+                      navigate(item.link);
+                    } else if (item.link) {
+                      navigate(item.link);
                     }
                   }}
                 >
@@ -160,6 +204,9 @@ function SideBar({ collapsed, onToggle, currentPage, onPageChange }) {
                         <button
                           className="w-full text-left p-2 text-sm text-slate-600 dark:text-slate-400 hover:text-slate-800
                         dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800/50 rounded-lg transition-all"
+                          onClick={() => {
+                            navigate(subitems.link);
+                          }}
                         >
                           {subitems.label}
                         </button>
@@ -188,7 +235,7 @@ function SideBar({ collapsed, onToggle, currentPage, onPageChange }) {
                     {user?.name || "Unknow"}
                   </p>
                   <p className="text-xs text-slate-500 dark:text-slate-400 truncate">
-                    Adminoistrator
+                    {restaurantstore?.name || "Adminoistrator"}
                   </p>
                 </div>
               </div>

@@ -1,4 +1,5 @@
 // store/userStore.ts
+import { set } from "react-hook-form";
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
 
@@ -15,6 +16,18 @@ interface UserStore {
   setUser: (user: User) => void;
   updateUser: (user: Partial<User>) => void;
   logout: () => void;
+}
+
+export interface Restaurant {
+  id: string;
+  name: string;
+}
+
+interface RestaurantStore {
+  restaurant: Restaurant | null;
+
+  setRestaurant: (restaurant: Restaurant) => void;
+  updateRestaurant: (restaurant: Partial<Restaurant>) => void;
 }
 
 export const useUserStore = create<UserStore>()(
@@ -42,6 +55,34 @@ export const useUserStore = create<UserStore>()(
     }),
     {
       name: "admin-user-storage", // localStorage key
+    },
+  ),
+);
+
+export const restaurantStore = create<RestaurantStore>()(
+  persist(
+    (set) => ({
+      restaurant: null,
+
+      setRestaurant: (restaurant) =>
+        set({
+          restaurant,
+        }),
+
+      updateRestaurant: (restaurantData) =>
+        set((state) => ({
+          restaurant: state.restaurant
+            ? { ...state.restaurant, ...restaurantData }
+            : null,
+        })),
+
+      logout: () =>
+        set({
+          restaurant: null,
+        }),
+    }),
+    {
+      name: "resto_store",
     },
   ),
 );

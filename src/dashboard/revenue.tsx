@@ -1,28 +1,4 @@
-import { ResponsiveContainer } from "recharts";
-
 function Revenue() {
-  const revenues = [
-    {
-      month: "Jan",
-      revenue: 45000,
-    },
-    {
-      month: "Feb",
-      revenue: 11234,
-    },
-    {
-      month: "March",
-      revenue: 3422,
-    },
-    {
-      month: "April",
-      revenue: 123,
-    },
-    {
-      month: "May",
-      revenue: 909834,
-    },
-  ];
   return (
     <div
       className="bg-white/80 dark:bg-slate-900/80 backdrop-blur-xl rounded-b-2xl border border-slate-200/50 dark:border-slate-700/50

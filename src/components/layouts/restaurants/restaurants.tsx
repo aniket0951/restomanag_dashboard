@@ -1,5 +1,5 @@
 import { useEffect } from "react";
-import { Pencil, Plus, Trash } from "lucide-react";
+import { Plus } from "lucide-react";
 import { form_class, rounded_button } from "../../../utils/csstags";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
@@ -13,11 +13,15 @@ import type {
 } from "../../../types/restaurant";
 import { EndPoint } from "../../../utils/endpoints";
 import toast from "react-hot-toast";
+import { LocalStorageKey } from "../../../utils/constants";
+import type { Restaurant as restaurantInterface } from "../../../store/user_store";
 
 const th_class: string =
-  "text-left p-4 text-sm font-semibold text-slate-600 border-r border-slate-200 dark:border-slate-700";
-const td: string = "p-4 border-r border-slate-200 dark:border-slate-700";
-const td_span: string = "text-sm font-medium text-blue dark:text-white";
+  "text-left p-4 text-sm font-semibold text-white border-r border-slate-200 dark:border-slate-700 hover";
+
+const td: string = "p-2 border-r border-slate-200 dark:border-slate-700";
+const td_span: string =
+  "text-gray-400 dark:text-gray-400 font-medium font-sans";
 const form_label: string =
   "block mb-2.5 text-sm font-medium text-heading dark:text-white";
 
@@ -61,13 +65,25 @@ const FoodType = [
     value: "both",
   },
 ];
+import type { UseFormSetValue, UseFormWatch } from "react-hook-form";
+import { unixToString } from "../../../utils/utils";
+import { restaurantStore } from "../../../store/user_store";
+import type { CreateOwnerLastActivityRes } from "../../../types/auth";
 
-function TagsInput({ label, name, register, setValue, watch }) {
+// Add this interface near your other types
+interface TagsInputProps {
+  label: string;
+  name: keyof RestaurantCreateForm;
+  setValue: UseFormSetValue<RestaurantCreateForm>;
+  watch: UseFormWatch<RestaurantCreateForm>;
+}
+
+function TagsInput({ label, name, setValue, watch }: TagsInputProps) {
   const [inputValue, setInputValue] = useState("");
-  const tags = watch(name) || [];
+  const tags = (watch(name) as string[]) || [];
 
   // Add tag on space or enter
-  const handleKeyDown = (e) => {
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if ((e.key === " " || e.key === "Enter") && inputValue.trim() !== "") {
       e.preventDefault();
 
@@ -81,10 +97,10 @@ function TagsInput({ label, name, register, setValue, watch }) {
     }
   };
 
-  const removeTag = (tag) => {
+  const removeTag = (tag: string) => {
     setValue(
       name,
-      tags.filter((t) => t !== tag),
+      tags.filter((t: string) => t !== tag),
     );
   };
 
@@ -96,7 +112,7 @@ function TagsInput({ label, name, register, setValue, watch }) {
 
       {/* Tags container */}
       <div className="flex flex-wrap gap-2 mb-2">
-        {tags.map((tag, index) => (
+        {tags.map((tag: string, index: number) => (
           <div
             key={index}
             className="flex items-center gap-1 bg-blue-600 text-white px-2 py-1 rounded-full text-xs"
@@ -133,11 +149,12 @@ function Restaurants() {
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [selectedState, setSelectedState] = useState("");
   const [restaurants, setRestaurants] = useState<ListRestaurantsRes[]>([]);
+  const [page, setPage] = useState(1);
+  const setRestoStore = restaurantStore((state) => state.setRestaurant);
 
   useEffect(() => {
-    console.log("fetching list of restaurantss...");
     fetchRestaurants();
-  }, []);
+  }, [page]);
 
   const {
     register,
@@ -170,11 +187,40 @@ function Restaurants() {
 
   const fetchRestaurants = async () => {
     try {
-      const res = await getApi<ListRestaurantsRes[]>(EndPoint.ListRestaurant);
+      const res = await getApi<ListRestaurantsRes[]>(
+        EndPoint.ListRestaurant + "?page=" + page,
+      );
       setRestaurants(res.data);
     } catch (err) {
       console.error(err);
     }
+  };
+
+  const switchRestaurant = async (restaurant: ListRestaurantsRes) => {
+    localStorage.setItem(LocalStorageKey.CurrentRestaurant, restaurant.pid);
+    const restoInterface: restaurantInterface = {
+      id: restaurant.pid,
+      name: restaurant.name,
+    };
+    setRestoStore(restoInterface);
+    const requestData = { restaurant_pid: restaurant.pid };
+    const res = await postApi<CreateOwnerLastActivityRes>(
+      EndPoint.CreateOwnerLastActivity,
+      requestData,
+    );
+    toast.success(res.message);
+    navigate("/dashboard");
+  };
+
+  const displayRestaurantDetails = (restaurant_id: string) => {
+    // localStorage.setItem(LocalStorageKey.CurrentRestaurant, restaurant_id);
+    navigate("/dashboard/restaurants/" + restaurant_id);
+  };
+
+  const fecthNextCategory = () => setPage((p) => p + 1);
+
+  const fecthPreviousCategory = () => {
+    setPage((p) => Math.max(p - 1, 1));
   };
 
   return (
@@ -238,7 +284,6 @@ function Restaurants() {
               <TagsInput
                 label="Cuisine (multiple)"
                 name="cuisine"
-                register={register}
                 setValue={setValue}
                 watch={watch}
               />
@@ -430,8 +475,8 @@ function Restaurants() {
       ) : (
         <>
           <div
-            className="bg-white/80 dark:bg-gray-900/80 backdrop-blur-xl rounded-b-2xl
-      border border-slate-200/50 dark:border-slate-700/50 overflow-hidden h-[600px]"
+            className="bg-slate-800 dark:bg-slate-800 backdrop-blur-xl rounded-xl
+      border border-slate-200/50 dark:border-slate-700/50 overflow-hidden"
           >
             <div className="p-6 border-b border-slate-200/50 dark:border-slate-700/50">
               <div className="flex items-center justify-between">
@@ -450,59 +495,89 @@ function Restaurants() {
               </div>
             </div>
 
-            <div className="overflow-x-auto">
+            <div className="overflow-auto max-h-[calc(600px-80px)]">
               <table className="w-full">
                 <thead className="border-b border-slate-300 dark:border-slate-700">
                   <tr>
+                    <th className={th_class}>ID</th>
                     <th className={th_class}> Restaurant Name </th>
                     <th className={th_class}> State </th>
                     <th className={th_class}> City </th>
                     <th className={th_class}> Cuisine </th>
                     <th className={th_class}> Food Type </th>
-                    <th className={th_class}>Action</th>
+                    <th className={th_class}> Action</th>
+                    <th className={th_class}> Created At</th>
                   </tr>
                 </thead>
                 <tbody>
-                  {restaurants.map((restaurant) => (
+                  {restaurants.map((restaurant, index) => (
                     <tr
-                      onClick={() =>
-                        navigate("/restaurantDetails/" + restaurant.pid)
-                      }
+                      onClick={() => displayRestaurantDetails(restaurant.pid)}
                       className="cursor-pointer border-b border-slate-200/50 dark:border-slate-700/50
-                hover:bg-slate-50/50 dark:hover:bg-slate-800/50 transition-colors"
+                hover:bg-slate-50/50 dark:hover:bg-slate-700/20 transition-colors"
+                      key={restaurant.pid}
                     >
-                      <td key={restaurant.pid} className={td}>
+                      <td className={td}>
+                        <span className={td_span}>{index + 1}</span>
+                      </td>
+                      <td className={td}>
                         <span className={td_span}>{restaurant.name}</span>
                       </td>
 
-                      <td key={restaurant.pid} className={td}>
+                      <td className={td}>
                         <span className={td_span}>{restaurant.state}</span>
                       </td>
-                      <td key={restaurant.pid} className={td}>
+                      <td className={td}>
                         <span className={td_span}>{restaurant.city}</span>
                       </td>
 
-                      <td key={restaurant.pid} className={td}>
+                      <td className={td}>
                         <span className={td_span}>{restaurant.cuisine}</span>
                       </td>
-                      <td key={restaurant.pid} className={td}>
+                      <td className={td}>
                         <span className={td_span}>{restaurant.food_type}</span>
                       </td>
-                      <td key={restaurant.pid} className={td}>
-                        <div className="flex gap-2 items-center">
-                          <button className={action_button}>
-                            <Pencil className="w-full h-4.5" />
-                          </button>
-
-                          <button className={action_button}>
-                            <Trash className="w-full h-4.5 " />
+                      <td className={td}>
+                        <div className="flex  items-center">
+                          <button
+                            className={action_button}
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              switchRestaurant(restaurant);
+                            }}
+                          >
+                            <span>Switch</span>
                           </button>
                         </div>
+                      </td>
+                      <td className={td}>
+                        <span className={td_span}>
+                          {unixToString(restaurant.created_at)}
+                        </span>
                       </td>
                     </tr>
                   ))}
                 </tbody>
               </table>
+            </div>
+            <div className="flex items-center justify-end p-1 border-t border-slate-200/50 dark:border-slate-700/50">
+              <span className="text-sm text-slate-600 dark:text-slate-300 m-3">
+                Page {page}
+              </span>
+              <button
+                disabled={page === 1}
+                onClick={fecthPreviousCategory}
+                className="px-4 py-2 m-1.5 bg-slate-200 dark:bg-slate-700 rounded-lg disabled:opacity-40 cursor-pointer text-white dark:text-white"
+              >
+                Previous
+              </button>
+
+              <button
+                onClick={fecthNextCategory}
+                className={`${rounded_button} cursor-pointer`}
+              >
+                Next
+              </button>
             </div>
           </div>
         </>

@@ -3,10 +3,7 @@ import { useState } from "react";
 
 import Header from "./components/layouts/header";
 import SideBar from "./components/layouts/sidebar";
-import Dashboard from "./dashboard/dashboard";
-import Orders from "./dashboard/orders";
-import Restaurants from "./components/layouts/restaurants/restaurants";
-import RestaurantFullDetails from "./components/layouts/restaurants/restaurant_full_details";
+
 import { Outlet } from "react-router-dom";
 
 function Home() {
@@ -29,19 +26,12 @@ function Home() {
         {/* Main content area */}
         <div className="flex-1 flex flex-col overflow-hidden">
           <Header
-            sidebarCollapsed={sideBarCollapsed}
+            // sidebarCollapsed={sideBarCollapsed}
             onToggleSidebar={() => setsideBarCollapsed(!sideBarCollapsed)}
           />
           {/* Page Content goes here */}
           <main className="flex-1 overflow-y-auto p-6 bg-transparent">
-            {/*<Outlet />*/}
-            {/*<Dashboard />*/}
-            <div className="p-6 space-y-6">
-              {currentPage === "dashboard" && <Dashboard />}
-              {currentPage === "orders" && <Orders />}
-              {currentPage === "restaurants" && <Restaurants />}
-              {currentPage === "restaurantDetails" && <RestaurantFullDetails />}
-            </div>
+            <Outlet />
           </main>
         </div>
       </div>

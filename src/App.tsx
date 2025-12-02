@@ -6,8 +6,18 @@ import OwnerSignUp from "./auth/owner_signup";
 
 import { Navigate } from "react-router-dom";
 import RestaurantFullDetails from "./components/layouts/restaurants/restaurant_full_details";
+import Dashboard from "./dashboard/dashboard";
+import Restaurants from "./components/layouts/restaurants/restaurants";
+import Categories from "./components/layouts/restaurants/categories";
+import CreateUpdateCategories from "./components/layouts/restaurants/create_update_categories";
+import Menus from "./components/layouts/restaurants/menus";
+import CreateMenuItems from "./components/layouts/restaurants/create_update_menu";
+import Tables from "./components/layouts/restaurants/tables";
+import CreateUpdateTable from "./components/layouts/restaurants/create_update_table";
+import Employees from "./components/layouts/empls/empls";
+import CreateUpdateEmpl from "./components/layouts/empls/create_update_empls";
 
-export function ProtectedRoute({ children }: { children: JSX.Element }) {
+export function ProtectedRoute({ children }: { children: React.ReactNode }) {
   const token = localStorage.getItem("authToken");
 
   if (!token) {
@@ -30,22 +40,27 @@ function App() {
       <Routes>
         <Route path="/" element={<Login />} />
         <Route path="/signup" element={<OwnerSignUp />} />
-        <Route
-          path="/dashboard"
-          element={
-            <ProtectedRoute>
-              <Home />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/restaurantDetails/:id"
-          element={
-            <ProtectedRoute>
-              <RestaurantFullDetails />
-            </ProtectedRoute>
-          }
-        />
+
+        <Route path="/dashboard" element={<Home />}>
+          {/* Dashboard pages go inside Home */}
+          <Route index element={<Dashboard />} />
+          <Route path="restaurants" element={<Restaurants />} />
+          <Route path="restaurants/:id" element={<RestaurantFullDetails />} />
+          <Route path="categories" element={<Categories />} />
+          <Route
+            path="categories/create"
+            element={<CreateUpdateCategories />}
+          />
+          <Route path="menu" element={<Menus />} />
+          <Route path="menu/create" element={<CreateMenuItems />} />
+          <Route path="menu/create/:id" element={<CreateMenuItems />} />
+          <Route path="table" element={<Tables />} />
+          <Route path="table/create" element={<CreateUpdateTable />} />
+
+          {/* Empl */}
+          <Route path="empl" element={<Employees />} />
+          <Route path="empl/create" element={<CreateUpdateEmpl />} />
+        </Route>
       </Routes>
       <Toaster position="top-right" />
     </div>
