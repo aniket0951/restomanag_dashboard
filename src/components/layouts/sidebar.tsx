@@ -61,6 +61,13 @@ const menuItems = [
     icon: School,
     lable: "Employees",
     link: "/dashboard/empl",
+    submenu: [
+      {
+        id: "attendance",
+        label: "Attendance",
+        link: "/dashboard/empl/attendance",
+      },
+    ],
   },
   {
     id: "orders",
@@ -202,8 +209,14 @@ function SideBar({
                     {item.submenu.map((subitems) => {
                       return (
                         <button
-                          className="w-full text-left p-2 text-sm text-slate-600 dark:text-slate-400 hover:text-slate-800
-                        dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800/50 rounded-lg transition-all"
+                          className={`w-full text-left p-2 text-sm font-black text-slate-600 dark:text-slate-400 hover:text-slate-800
+                        dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800/50 rounded-lg transition-all
+                        ${
+                          location.pathname === subitems.link
+                            ? "bg-gradient-to-r from-blue-500 to-purple-600 text-white dark:text-white shadow-lg shadow-blue-500/25"
+                            : "text-slate-400 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800/50"
+                        }
+                        `}
                           onClick={() => {
                             navigate(subitems.link);
                           }}

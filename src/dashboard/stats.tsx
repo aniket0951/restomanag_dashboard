@@ -2,16 +2,9 @@ import {
   ArrowDownLeft,
   ArrowUpRight,
   BadgeCheck,
-  CheckCircle2,
-  ClipboardList,
   DollarSign,
-  FilePlay,
-  FilePlus,
   Hourglass,
-  ListPlus,
   PackagePlus,
-  PlusCircle,
-  Sparkles,
   Wallet2,
 } from "lucide-react";
 import type { ReactNode } from "react";

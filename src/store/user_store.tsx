@@ -1,5 +1,4 @@
 // store/userStore.ts
-import { set } from "react-hook-form";
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
 
@@ -54,7 +53,7 @@ export const useUserStore = create<UserStore>()(
         }),
     }),
     {
-      name: "admin-user-storage", // localStorage key
+      name: "admin-user-storage",
     },
   ),
 );
