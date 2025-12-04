@@ -25,6 +25,7 @@ export interface CreateEmployeeRes {
 }
 
 export interface EmployeeAttendanceRes {
+  pid: string;
   name: string;
   empl_code: string;
   attendance_status: string;

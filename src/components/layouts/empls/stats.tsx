@@ -1,4 +1,4 @@
-import { ArrowRight, type LucideIcon } from "lucide-react";
+import { type LucideIcon } from "lucide-react";
 import { useEffect, type ReactNode } from "react";
 import { useSideBarStore } from "../../../store/sidebar";
 

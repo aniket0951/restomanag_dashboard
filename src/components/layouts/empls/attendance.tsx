@@ -26,11 +26,12 @@ const parent_div: string =
   "bg-white/80 bg-slate-800 dark:bg-slate-800 rounded-xl backdrop-blur-xl overflow-hidden w-full p-2 mt-5 border border-slate-200/50 dark:border-slate-700/50";
 
 const action_button: string =
-  "relative w-full p-1 rounded-xl text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors";
+  "relative w-full  p-1 rounded-xl text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors";
 
 function Attendance() {
   const [attendance, setAttendance] = useState<EmployeeAttendanceRes[]>([
     {
+      pid: "ds",
       name: "Aniket Suryawanshi",
       empl_code: "0001",
       attendance_status: "present",
@@ -39,6 +40,7 @@ function Attendance() {
       out_time: "18:00 PM",
     },
     {
+      pid: "ds",
       name: "Aniket Suryawanshi I",
       empl_code: "0001",
       attendance_status: "absent",
@@ -47,6 +49,7 @@ function Attendance() {
       out_time: "18:00 PM",
     },
     {
+      pid: "ds",
       name: "Aniket Suryawanshi I",
       empl_code: "0001",
       attendance_status: "Not Logged",
@@ -79,8 +82,14 @@ function Attendance() {
     }
   };
 
-  const editMenuItem = (menu: EmployeeAttendanceRes) => {
-    navigate("/dashboard/menu/create", { state: { menu } });
+  const generateAttendanceReport = (emplPID: string) => {
+    console.log("EMPL_ID : ", emplPID);
+  };
+
+  const editAttendance = (attendance: EmployeeAttendanceRes) => {
+    navigate("/dashboard/empl/attendance/create", {
+      state: { attendance: attendance },
+    });
   };
 
   return (
@@ -130,7 +139,7 @@ function Attendance() {
                     <button
                       className="absolute right-2 top-1/2 transform -translate-y-1/2 px-4 py-1.5
                       bg-blue-500 hover:bg-blue-600 text-white text-sm font-medium rounded-lg
-                      transition-colors"
+                      transition-colors cursor-pointer"
                     >
                       Search
                     </button>
@@ -177,7 +186,7 @@ function Attendance() {
                   {/* Apply Button */}
                   <button
                     className="px-3 py-1.5 bg-blue-500 hover:bg-blue-600 text-white font-medium
-                    rounded-xl transition-colors"
+                    rounded-xl transition-colors cursor-pointer"
                   >
                     Apply
                   </button>
@@ -197,6 +206,7 @@ function Attendance() {
                     <th className={th_class}> In Time </th>
                     <th className={th_class}> Out Time </th>
                     <th className={th_class}> Action </th>
+                    <th className={th_class}> Attendance Report </th>
                   </tr>
                 </thead>
                 <tbody>
@@ -251,29 +261,32 @@ function Attendance() {
                         </span>
                       </td>
 
-                      <td className={td}>
-                        <div className="flex  items-center">
+                      <td className="p-4 border-r border-slate-200 dark:border-slate-700">
+                        <div className="flex justify-center">
                           <button
                             className={action_button}
                             onClick={(e) => {
                               e.stopPropagation();
-                              editMenuItem(item);
+                              editAttendance(item);
                             }}
                           >
-                            <span className="flex  justify-center cursor-pointer">
+                            <span className="flex justify-center cursor-pointer p-3">
                               <PencilIcon className="w-5 h-5 text-green-600" />
                             </span>
                           </button>
+                        </div>
+                      </td>
+                      <td className="p-4 border-r border-slate-200 dark:border-slate-700">
+                        <div className="m-3 p-2">
                           <button
-                            className={action_button}
+                            className={`${rounded_button} cursor-pointer`}
                             onClick={(e) => {
                               e.stopPropagation();
-                              // setSelectedItemId(item.pid);
-                              setShowConfirm(true);
+                              generateAttendanceReport(item.pid);
                             }}
                           >
                             <span className="flex  justify-center cursor-pointer">
-                              <Trash2 className="w-5 h-5 text-red-500" />
+                              Generate
                             </span>
                           </button>
                         </div>
