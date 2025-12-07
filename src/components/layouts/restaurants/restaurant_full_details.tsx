@@ -7,6 +7,7 @@ import { EndPoint } from "../../../utils/endpoints";
 import Categories from "./categories";
 import Menus from "./menus";
 import Tables from "./tables";
+import Employees from "../empls/empls";
 const owner_details_h3: string =
   "text-gray-400 dark:text-gray-400 font-medium font-sans";
 
@@ -97,13 +98,13 @@ function RestaurantFullDetails() {
         </div>
       </div>
       {/* Categories */}
-      <Categories />
+      <Categories restaurantID={id ?? null} />
 
       {/*Menus*/}
-      <Menus />
+      <Menus restaurantID={id ?? null} />
 
       {/* Table */}
-      <Tables />
+      <Tables restaurantID={id ?? nul} />
     </div>
   );
 }

@@ -1,11 +1,8 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import EmplStats, { AttendanceCounts } from "./stats";
 import {
-  Calendar,
   PencilIcon,
-  Plus,
   Search,
-  Trash2,
   UserCog,
   UserRoundCheck,
   UserRoundX,

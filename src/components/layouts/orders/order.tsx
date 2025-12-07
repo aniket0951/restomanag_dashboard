@@ -8,13 +8,15 @@ import StatusGrid, {
 function Orders() {
   return (
     <div>
-      <span>Order</span>
       <StatusGrid>
         <OrderInit />
         <PendingOrders />
         <CompletedOrders />
         <CurrentDayRevenue />
       </StatusGrid>
+      <span className="text-slate-400 dark:text-slate-300 mt-5">
+        Current Orders
+      </span>
     </div>
   );
 }

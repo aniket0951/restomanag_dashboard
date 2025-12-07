@@ -20,7 +20,11 @@ const parent_div: string =
 const action_button: string =
   "relative w-full p-1 rounded-xl text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors";
 
-function Menus() {
+type Params = {
+  restaurantID: string | null;
+};
+
+function Menus({ restaurantID }: Params) {
   const [menuItems, setMenuItems] = useState<ListMenuItemsRes[]>([]);
   const [page, setPage] = useState(1);
   const navigate = useNavigate();
@@ -33,11 +37,21 @@ function Menus() {
 
   const fetchMenuItemsByRestaurant = async () => {
     try {
-      const restaurantPID = localStorage.getItem(
-        LocalStorageKey.CurrentRestaurant,
-      );
+      let restaurant_pid: string = "";
+
+      if (
+        restaurantID != "" &&
+        restaurantID != null &&
+        restaurantID != undefined
+      ) {
+        restaurant_pid = restaurantID;
+      } else {
+        restaurant_pid =
+          localStorage.getItem(LocalStorageKey.CurrentRestaurant) ?? "";
+      }
+
       const endpoint: string =
-        EndPoint.ListMenuItemsByRestaurant + restaurantPID + "?page=" + page;
+        EndPoint.ListMenuItemsByRestaurant + restaurant_pid + "?page=" + page;
       const res = await getApi<ListMenuItemsRes[]>(endpoint);
 
       setMenuItems(res.data);

@@ -49,15 +49,18 @@ function App() {
           <Route index element={<Dashboard />} />
           <Route path="restaurants" element={<Restaurants />} />
           <Route path="restaurants/:id" element={<RestaurantFullDetails />} />
-          <Route path="categories" element={<Categories />} />
+          <Route
+            path="categories"
+            element={<Categories restaurantID={null} />}
+          />
           <Route
             path="categories/create"
             element={<CreateUpdateCategories />}
           />
-          <Route path="menu" element={<Menus />} />
+          <Route path="menu" element={<Menus restaurantID={null} />} />
           <Route path="menu/create" element={<CreateMenuItems />} />
           <Route path="menu/create/:id" element={<CreateMenuItems />} />
-          <Route path="table" element={<Tables />} />
+          <Route path="table" element={<Tables restaurantID={null} />} />
           <Route path="table/create" element={<CreateUpdateTable />} />
 
           {/* Empl */}
