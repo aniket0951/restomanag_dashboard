@@ -23,3 +23,13 @@ export interface CreateEmployeeRes {
   joining_date: number;
   created_at: number;
 }
+
+export interface EmployeeAttendanceRes {
+  pid: string;
+  name: string;
+  empl_code: string;
+  attendance_status: string;
+  attendance_date: string;
+  in_time: string;
+  out_time: string;
+}

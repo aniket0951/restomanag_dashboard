@@ -5,7 +5,7 @@ import { restaurantStore, useUserStore } from "../../../store/user_store";
 import { postApi } from "../../../utils/api";
 import { EndPoint } from "../../../utils/endpoints";
 import toast from "react-hot-toast";
-import { useLoaderData, useLocation, useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 
 const form_label: string =
   "block mb-2.5 text-sm font-black text-heading dark:text-white";

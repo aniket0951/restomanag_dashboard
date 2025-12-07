@@ -19,8 +19,10 @@ const parent_div: string =
 
 const action_button: string =
   "relative w-full  rounded-xl text-slate-600 dark:text-slate-300  transition-colors";
-
-function Tables() {
+type Params = {
+  restaurantID: string | null;
+};
+function Tables({ restaurantID }: Params) {
   const [restauranTables, setRestauranTables] = useState<
     ListRestaurantTablesRes[]
   >([]);
@@ -41,11 +43,20 @@ function Tables() {
 
   const fetchRestaurantTables = async () => {
     try {
-      const restaurantPID = localStorage.getItem(
-        LocalStorageKey.CurrentRestaurant,
-      );
+      let restaurant_pid: string = "";
+
+      if (
+        restaurantID != "" &&
+        restaurantID != null &&
+        restaurantID != undefined
+      ) {
+        restaurant_pid = restaurantID;
+      } else {
+        restaurant_pid =
+          localStorage.getItem(LocalStorageKey.CurrentRestaurant) ?? "";
+      }
       const res = await getApi<ListRestaurantTablesRes[]>(
-        EndPoint.ListRestaurantTables + restaurantPID,
+        EndPoint.ListRestaurantTables + restaurant_pid,
       );
       setRestauranTables(res.data);
     } catch {

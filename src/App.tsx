@@ -16,6 +16,9 @@ import Tables from "./components/layouts/restaurants/tables";
 import CreateUpdateTable from "./components/layouts/restaurants/create_update_table";
 import Employees from "./components/layouts/empls/empls";
 import CreateUpdateEmpl from "./components/layouts/empls/create_update_empls";
+import Orders from "./components/layouts/orders/order";
+import Attendance from "./components/layouts/empls/attendance";
+import CreateUpdateAttendance from "./components/layouts/empls/create_update_attendance";
 
 export function ProtectedRoute({ children }: { children: React.ReactNode }) {
   const token = localStorage.getItem("authToken");
@@ -46,20 +49,31 @@ function App() {
           <Route index element={<Dashboard />} />
           <Route path="restaurants" element={<Restaurants />} />
           <Route path="restaurants/:id" element={<RestaurantFullDetails />} />
-          <Route path="categories" element={<Categories />} />
+          <Route
+            path="categories"
+            element={<Categories restaurantID={null} />}
+          />
           <Route
             path="categories/create"
             element={<CreateUpdateCategories />}
           />
-          <Route path="menu" element={<Menus />} />
+          <Route path="menu" element={<Menus restaurantID={null} />} />
           <Route path="menu/create" element={<CreateMenuItems />} />
           <Route path="menu/create/:id" element={<CreateMenuItems />} />
-          <Route path="table" element={<Tables />} />
+          <Route path="table" element={<Tables restaurantID={null} />} />
           <Route path="table/create" element={<CreateUpdateTable />} />
 
           {/* Empl */}
           <Route path="empl" element={<Employees />} />
           <Route path="empl/create" element={<CreateUpdateEmpl />} />
+          <Route path="empl/attendance" element={<Attendance />} />
+          <Route
+            path="empl/attendance/create"
+            element={<CreateUpdateAttendance />}
+          />
+
+          {/* Orders */}
+          <Route path="order" element={<Orders />} />
         </Route>
       </Routes>
       <Toaster position="top-right" />

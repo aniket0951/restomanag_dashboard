@@ -20,7 +20,11 @@ const parent_div: string =
 const action_button: string =
   "relative w-full p-1 rounded-xl text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors";
 
-function Categories() {
+type Params = {
+  restaurantID: string | null;
+};
+
+function Categories({ restaurantID }: Params) {
   const navigate = useNavigate();
   const [categories, setCategories] = useState<ListCategoriesRes[]>([]);
   const [page, setPage] = useState(1);
@@ -29,9 +33,19 @@ function Categories() {
 
   const fetchCategories = useCallback(async () => {
     try {
-      const restaurant_pid = localStorage.getItem(
-        LocalStorageKey.CurrentRestaurant,
-      );
+      let restaurant_pid: string = "";
+
+      if (
+        restaurantID != "" &&
+        restaurantID != null &&
+        restaurantID != undefined
+      ) {
+        restaurant_pid = restaurantID;
+      } else {
+        restaurant_pid =
+          localStorage.getItem(LocalStorageKey.CurrentRestaurant) ?? "";
+      }
+
       const endpoint =
         EndPoint.ListMenuCategoriesByRestaurant +
         restaurant_pid +
