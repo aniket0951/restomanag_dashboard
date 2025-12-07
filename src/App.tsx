@@ -19,6 +19,7 @@ import CreateUpdateEmpl from "./components/layouts/empls/create_update_empls";
 import Orders from "./components/layouts/orders/order";
 import Attendance from "./components/layouts/empls/attendance";
 import CreateUpdateAttendance from "./components/layouts/empls/create_update_attendance";
+import CreateUpdareRestaurant from "./components/layouts/restaurants/create_update_restaurant";
 
 export function ProtectedRoute({ children }: { children: React.ReactNode }) {
   const token = localStorage.getItem("authToken");
@@ -49,6 +50,10 @@ function App() {
           <Route index element={<Dashboard />} />
           <Route path="restaurants" element={<Restaurants />} />
           <Route path="restaurants/:id" element={<RestaurantFullDetails />} />
+          <Route
+            path="restaurants/create"
+            element={<CreateUpdareRestaurant />}
+          />
           <Route
             path="categories"
             element={<Categories restaurantID={null} />}
