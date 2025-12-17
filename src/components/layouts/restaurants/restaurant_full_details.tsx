@@ -1,13 +1,13 @@
 import { useEffect, useRef, useState } from "react";
-import { useParams } from "react-router-dom";
-
+import { useNavigate, useParams } from "react-router-dom";
+import { rounded_button } from "../../../utils/csstags";
 import { getApi } from "../../../utils/api";
 import type { GetRestaurantRes } from "../../../types/restaurant";
 import { EndPoint } from "../../../utils/endpoints";
 import Categories from "./categories";
 import Menus from "./menus";
 import Tables from "./tables";
-import Employees from "../empls/empls";
+import { Plus } from "lucide-react";
 const owner_details_h3: string =
   "text-gray-400 dark:text-gray-400 font-medium font-sans";
 
@@ -21,6 +21,7 @@ function RestaurantFullDetails() {
   const [restaurantDetails, setRestaurantDetails] =
     useState<GetRestaurantRes | null>(null);
   const calledRef = useRef(false);
+  const navigate = useNavigate();
 
   useEffect(() => {
     if (calledRef.current) return;
@@ -38,14 +39,33 @@ function RestaurantFullDetails() {
     }
   };
 
+  const addGeoLocation = (restaurantPID: string) => {
+    navigate("/dashboard/restaurants/geolocation", {
+      state: { restaurantPID: restaurantPID },
+    });
+  };
+
   return (
     <div className="">
       {/* Restaurant Details */}
       <div className={parent_div}>
+        <div className="p-6 border-b border-slate-200/50 dark:border-slate-700/50">
+          <div className="flex items-center justify-between">
+            <div>
+              <h3 className="text-lg font-bold text-slate-800 dark:text-white">
+                Restaurant Details
+              </h3>
+            </div>
+            {/*<button
+              className={`${rounded_button} cursor-pointer`}
+              onClick={() => addGeoLocation(restaurantDetails?.pid || "")}
+            >
+              <Plus className="w-4 h-4" />
+              <span className="text-sm font-medium">Add GeoLocation</span>
+            </button>*/}
+          </div>
+        </div>
         <div className="p-3.5">
-          <h1 className="text-white dark:text-white font-semibold">
-            Restaurant Details
-          </h1>
           <div className="grid grid-cols-2 gap-4 p-4">
             <div className="p-1">
               <h2 className={div_h2}>Name</h2>
@@ -104,7 +124,7 @@ function RestaurantFullDetails() {
       <Menus restaurantID={id ?? null} />
 
       {/* Table */}
-      <Tables restaurantID={id ?? nul} />
+      <Tables restaurantID={id ?? null} />
     </div>
   );
 }
