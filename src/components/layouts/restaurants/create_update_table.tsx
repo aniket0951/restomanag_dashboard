@@ -19,6 +19,7 @@ type CreateRestaurantTableForm = {
   status: string;
   pid: string;
   restaurant_pid: string;
+  capacity: number;
 };
 
 function CreateUpdateTable() {
@@ -41,7 +42,7 @@ function CreateUpdateTable() {
       setValue("pid", stateCurrentTable.pid);
       setItemMenuForUpdate(true);
     }
-  });
+  }, [setItemMenuForUpdate, setValue, stateCurrentTable]);
 
   const onUpdate = async (data: CreateRestaurantTableForm) => {
     try {
@@ -69,7 +70,7 @@ function CreateUpdateTable() {
         LocalStorageKey.CurrentRestaurant,
       );
       data.restaurant_pid = restaurantPID ?? "";
-
+      console.log("Data : ", data);
       const res = await postApi<CreateRestaurantTableRes>(
         EndPoint.CreateRestaurantTable,
         data,
@@ -111,6 +112,24 @@ function CreateUpdateTable() {
             {errors.number && (
               <p className="text-red-400 text-xs mt-1">
                 {errors.number.message}
+              </p>
+            )}
+          </div>
+          {/* Table Capacity */}
+          <div className="relative z-0 p-5 w-sm">
+            <label className={form_label}>Table Capacity</label>
+            <input
+              {...register("capacity", {
+                required: "Number is required",
+                valueAsNumber: true,
+              })}
+              type="number"
+              className={form_input}
+              placeholder="2 , 4"
+            />
+            {errors.capacity && (
+              <p className="text-red-400 text-xs mt-1">
+                {errors.capacity.message}
               </p>
             )}
           </div>

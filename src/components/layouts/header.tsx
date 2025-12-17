@@ -10,7 +10,10 @@ import {
 import { useUserStore, restaurantStore } from "../../store/user_store";
 import { useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
+
+const dropdown_btn: string =
+  "w-full text-left px-4 py-2 hover:bg-slate-100 dark:hover:bg-slate-700 text-sm font-medium text-slate-500 dark:text-slate-400";
 
 type HeaderProps = {
   onToggleSidebar: () => void;
@@ -21,6 +24,7 @@ function Header({ onToggleSidebar }: HeaderProps) {
   const restaurantstore = restaurantStore((state) => state.restaurant);
   const [open, setOpen] = useState(false);
   const [coords, setCoords] = useState({ top: 0, left: 0 });
+  const location = useLocation();
 
   const btnRef = useRef<HTMLDivElement | null>(null);
   const dropdownRef = useRef<HTMLDivElement | null>(null);
@@ -67,6 +71,21 @@ function Header({ onToggleSidebar }: HeaderProps) {
     navigate("/");
   };
 
+  const displayProfile = () => {
+    const path: string = "/dashboard/restaurants/";
+    const currentPath: string = location.pathname;
+    if (currentPath.startsWith(path)) {
+      navigate(path + restaurantstore?.id, { replace: true });
+      window.location.reload();
+    } else {
+      navigate(path + restaurantstore?.id);
+    }
+  };
+
+  const createNewRestaurant = () => {
+    navigate("/dashboard/restaurants/create");
+  };
+
   return (
     <>
       <div className="bg-white/80 dark:bg-slate-900/80 backdrop-blur-xl border-b border-slate-200/50 dark:border-slate-700/50 px-6 py-3">
@@ -110,7 +129,8 @@ function Header({ onToggleSidebar }: HeaderProps) {
             <button
               className="hidden lg:flex items-center space-x-2 py-2 px-4
               bg-gradient-to-r from-blue-500 to-purple-600 text-white rounded-xl hover:shadow
-              transition-all"
+              transition-all cursor-pointer"
+              onClick={() => createNewRestaurant()}
             >
               <Plus className="w-4 h-4" />
               <span className="text-sm font-medium">New</span>
@@ -166,16 +186,11 @@ function Header({ onToggleSidebar }: HeaderProps) {
             className="fixed w-48 bg-white dark:bg-slate-800 shadow-xl rounded-xl py-2
                        border border-slate-200 dark:border-slate-700 z-[9999] animate-fadeIn"
           >
-            <button className="w-full text-left px-4 py-2 hover:bg-slate-100 dark:hover:bg-slate-700 text-sm font-medium text-slate-500 dark:text-slate-400">
+            <button className={dropdown_btn} onClick={() => displayProfile()}>
               Profile
             </button>
-            <button className="w-full text-left px-4 py-2 hover:bg-slate-100 dark:hover:bg-slate-700 text-sm font-medium text-slate-500 dark:text-slate-400">
-              Settings
-            </button>
-            <button
-              onClick={logOut}
-              className="w-full text-left px-4 py-2 hover:bg-slate-100 dark:hover:bg-slate-700 text-sm font-medium text-slate-500 dark:text-slate-400"
-            >
+            <button className={dropdown_btn}>Settings</button>
+            <button onClick={logOut} className={dropdown_btn}>
               Logout
             </button>
           </div>,
