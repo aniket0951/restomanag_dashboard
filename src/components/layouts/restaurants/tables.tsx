@@ -8,6 +8,8 @@ import { useNavigate } from "react-router-dom";
 import { unixToString } from "../../../utils/utils";
 import { LocalStorageKey } from "../../../utils/constants";
 import toast from "react-hot-toast/headless";
+import QRCode from "qrcode";
+import { restaurantStore } from "../../../store/user_store";
 
 const th_class: string =
   "text-left p-4 text-sm font-semibold text-white border-r border-slate-200 dark:border-slate-700";
@@ -30,7 +32,11 @@ function Tables({ restaurantID }: Params) {
   const navigate = useNavigate();
   const [showConfirm, setShowConfirm] = useState(false);
   const [selectedItemId, setSelectedItemId] = useState("");
-
+  const [showQRModal, setShowQRModal] = useState(false);
+  const [qrCodeData, setQrCodeData] = useState<string>("");
+  const [selectedTable, setSelectedTable] =
+    useState<ListRestaurantTablesRes | null>(null);
+  const restoStore = restaurantStore((state) => state.restaurant);
   const fecthNextCategory = () => setPage((p) => p + 1);
 
   const fecthPreviousCategory = () => {
@@ -84,6 +90,47 @@ function Tables({ restaurantID }: Params) {
     }
   };
 
+  const downloadQR = async (table: ListRestaurantTablesRes) => {
+    try {
+      const qrData = JSON.stringify({
+        tableId: table.pid,
+        tableNumber: table.number,
+        capacity: table.capacity,
+        restaurantName: restoStore?.name ? restoStore?.name : "NA",
+      });
+
+      const qrDataURL = await QRCode.toDataURL(qrData, {
+        width: 400,
+        margin: 2,
+        color: {
+          dark: "#000000",
+          light: "#FFFFFF",
+        },
+      });
+
+      setQrCodeData(qrDataURL);
+      setSelectedTable(table);
+      setShowQRModal(true);
+    } catch (error) {
+      console.error("Error generating QR code:", error);
+      toast.error("Failed to generate QR code");
+    }
+  };
+
+  const handleDownloadQR = () => {
+    if (!qrCodeData || !selectedTable) return;
+
+    const link = document.createElement("a");
+    link.href = qrCodeData;
+    link.download = `Table_${selectedTable.number}_QR.png`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+
+    toast.success("QR Code downloaded successfully");
+    setShowQRModal(false);
+  };
+
   return (
     <>
       {restauranTables.length > 0 ? (
@@ -111,9 +158,11 @@ function Tables({ restaurantID }: Params) {
                 <tr>
                   <th className={th_class}>ID</th>
                   <th className={th_class}> Table Number </th>
+                  <th className={th_class}> Table Capacity </th>
                   <th className={th_class}> Status </th>
                   <th className={th_class}> Created At</th>
                   <th className={th_class}> Action </th>
+                  <th className={th_class}> Table QR </th>
                 </tr>
               </thead>
               <tbody>
@@ -129,6 +178,12 @@ function Tables({ restaurantID }: Params) {
                     <td className={td}>
                       <span className={td_span}>
                         {menu?.number ? `Table_${menu.number}` : "NA"}
+                      </span>
+                    </td>
+
+                    <td className={td}>
+                      <span className={td_span}>
+                        {menu?.number ? `${menu.capacity} Person` : "NA"}
                       </span>
                     </td>
 
@@ -178,6 +233,14 @@ function Tables({ restaurantID }: Params) {
                         </button>
                       </div>
                     </td>
+                    <td className={td}>
+                      <button
+                        className={`${action_button} cursor-pointer hover:bg-slate-100 dark:hover:bg-slate-800 p-2`}
+                        onClick={() => downloadQR(menu)}
+                      >
+                        Download
+                      </button>
+                    </td>
                   </tr>
                 ))}
               </tbody>
@@ -202,35 +265,6 @@ function Tables({ restaurantID }: Params) {
               Next
             </button>
           </div>
-          {showConfirm && (
-            <div className="fixed inset-0 flex items-center justify-center bg-black/50">
-              <div className="bg-white p-6 rounded-xl shadow-xl w-80">
-                <h3 className="text-lg font-semibold mb-4">Confirm Delete</h3>
-                <p className="text-sm text-gray-600 mb-6">
-                  Are you sure you want to delete this table?
-                </p>
-
-                <div className="flex justify-end space-x-3">
-                  <button
-                    onClick={() => setShowConfirm(false)}
-                    className="px-4 py-2 rounded-lg bg-gray-200 hover:bg-gray-300"
-                  >
-                    Cancel
-                  </button>
-
-                  <button
-                    onClick={() => {
-                      deleteTable(selectedItemId);
-                      setShowConfirm(false);
-                    }}
-                    className="px-4 py-2 rounded-lg bg-red-500 text-white hover:bg-red-600"
-                  >
-                    Delete
-                  </button>
-                </div>
-              </div>
-            </div>
-          )}
         </div>
       ) : (
         <div className={parent_div}>
@@ -250,6 +284,79 @@ function Tables({ restaurantID }: Params) {
             <span className="text-sm font-medium dark:text-red-300">
               Data not available
             </span>
+          </div>
+        </div>
+      )}
+      {showConfirm && (
+        <div className="fixed inset-0 flex items-center justify-center bg-black/50 z-50">
+          <div className="bg-white p-6 rounded-xl shadow-xl w-80">
+            <h3 className="text-lg font-semibold mb-4">Confirm Delete</h3>
+            <p className="text-sm text-gray-600 mb-6">
+              Are you sure you want to delete this table?
+            </p>
+
+            <div className="flex justify-end space-x-3">
+              <button
+                onClick={() => setShowConfirm(false)}
+                className="px-4 py-2 rounded-lg bg-gray-200 hover:bg-gray-300"
+              >
+                Cancel
+              </button>
+
+              <button
+                onClick={() => {
+                  deleteTable(selectedItemId);
+                  setShowConfirm(false);
+                }}
+                className="px-4 py-2 rounded-lg bg-red-500 text-white hover:bg-red-600"
+              >
+                Delete
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+      {showQRModal && (
+        <div className="fixed inset-0 flex items-center justify-center bg-black/50 z-50">
+          <div className="bg-white dark:bg-slate-800 p-6 rounded-xl shadow-xl w-96">
+            <h3 className="text-lg font-semibold mb-4 text-slate-800 dark:text-white">
+              Table QR Code
+            </h3>
+            {selectedTable && (
+              <div className="mb-4">
+                <p className="text-sm text-slate-600 dark:text-slate-300">
+                  Table Number:{" "}
+                  <span className="font-semibold">
+                    Table_{selectedTable.number}
+                  </span>
+                </p>
+                <p className="text-sm text-slate-600 dark:text-slate-300">
+                  Capacity:{" "}
+                  <span className="font-semibold">
+                    {selectedTable.capacity} Person
+                  </span>
+                </p>
+              </div>
+            )}
+            <div className="flex justify-center mb-6 bg-white p-4 rounded-lg">
+              <img src={qrCodeData} alt="QR Code" className="w-64 h-64" />
+            </div>
+
+            <div className="flex justify-end space-x-3">
+              <button
+                onClick={() => setShowQRModal(false)}
+                className="px-4 py-2 rounded-lg bg-gray-200 dark:bg-slate-700 hover:bg-gray-300 dark:hover:bg-slate-600 text-slate-800 dark:text-white"
+              >
+                Cancel
+              </button>
+
+              <button
+                onClick={handleDownloadQR}
+                className="px-4 py-2 rounded-lg bg-blue-500 text-white hover:bg-blue-600"
+              >
+                Download
+              </button>
+            </div>
           </div>
         </div>
       )}
