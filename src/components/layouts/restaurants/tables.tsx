@@ -97,6 +97,7 @@ function Tables({ restaurantID }: Params) {
         tableNumber: table.number,
         capacity: table.capacity,
         restaurantName: restoStore?.name ? restoStore?.name : "NA",
+        restaurantPID: restoStore?.id ? restoStore?.id : "NA",
       });
 
       const qrDataURL = await QRCode.toDataURL(qrData, {
