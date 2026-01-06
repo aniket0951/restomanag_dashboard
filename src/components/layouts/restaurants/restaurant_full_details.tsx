@@ -1,13 +1,11 @@
 import { useEffect, useRef, useState } from "react";
-import { useNavigate, useParams } from "react-router-dom";
-import { rounded_button } from "../../../utils/csstags";
+import { useParams } from "react-router-dom";
 import { getApi } from "../../../utils/api";
 import type { GetRestaurantRes } from "../../../types/restaurant";
 import { EndPoint } from "../../../utils/endpoints";
 import Categories from "./categories";
 import Menus from "./menus";
 import Tables from "./tables";
-import { Plus } from "lucide-react";
 const owner_details_h3: string =
   "text-gray-400 dark:text-gray-400 font-medium font-sans";
 
@@ -21,7 +19,6 @@ function RestaurantFullDetails() {
   const [restaurantDetails, setRestaurantDetails] =
     useState<GetRestaurantRes | null>(null);
   const calledRef = useRef(false);
-  const navigate = useNavigate();
 
   useEffect(() => {
     if (calledRef.current) return;
@@ -37,12 +34,6 @@ function RestaurantFullDetails() {
     } catch {
       console.log("Error");
     }
-  };
-
-  const addGeoLocation = (restaurantPID: string) => {
-    navigate("/dashboard/restaurants/geolocation", {
-      state: { restaurantPID: restaurantPID },
-    });
   };
 
   return (

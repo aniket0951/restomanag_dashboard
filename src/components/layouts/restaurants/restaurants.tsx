@@ -105,113 +105,120 @@ function Restaurants() {
             </button>
           </div>
         </div>
+        {restaurants.length > 0 ? (
+          <>
+            <div className="overflow-auto max-h-[calc(600px-80px)]">
+              <table className="w-full">
+                <thead className="border-b border-slate-300 dark:border-slate-700">
+                  <tr>
+                    <th className={th_class}>ID</th>
+                    <th className={th_class}> Restaurant Name </th>
+                    <th className={th_class}> State </th>
+                    <th className={th_class}> City </th>
+                    <th className={th_class}> Cuisine </th>
+                    <th className={th_class}> Food Type </th>
+                    <th className={th_class}> Action</th>
+                    <th className={th_class}> Created At</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {restaurants.map((restaurant, index) => (
+                    <tr
+                      onClick={() => displayRestaurantDetails(restaurant.pid)}
+                      className="cursor-pointer border-b border-slate-200/50 dark:border-slate-700/50
+             hover:bg-slate-50/50 dark:hover:bg-slate-700/20 transition-colors"
+                      key={restaurant.pid}
+                    >
+                      <td className={td}>
+                        <span className={td_span}>{index + 1}</span>
+                      </td>
+                      <td className={td}>
+                        <span className={td_span}>{restaurant.name}</span>
+                      </td>
 
-        <div className="overflow-auto max-h-[calc(600px-80px)]">
-          <table className="w-full">
-            <thead className="border-b border-slate-300 dark:border-slate-700">
-              <tr>
-                <th className={th_class}>ID</th>
-                <th className={th_class}> Restaurant Name </th>
-                <th className={th_class}> State </th>
-                <th className={th_class}> City </th>
-                <th className={th_class}> Cuisine </th>
-                <th className={th_class}> Food Type </th>
-                <th className={th_class}> Action</th>
-                <th className={th_class}> Created At</th>
-              </tr>
-            </thead>
-            <tbody>
-              {restaurants.map((restaurant, index) => (
-                <tr
-                  onClick={() => displayRestaurantDetails(restaurant.pid)}
-                  className="cursor-pointer border-b border-slate-200/50 dark:border-slate-700/50
-            hover:bg-slate-50/50 dark:hover:bg-slate-700/20 transition-colors"
-                  key={restaurant.pid}
-                >
-                  <td className={td}>
-                    <span className={td_span}>{index + 1}</span>
-                  </td>
-                  <td className={td}>
-                    <span className={td_span}>{restaurant.name}</span>
-                  </td>
+                      <td className={td}>
+                        <span className={td_span}>{restaurant.state}</span>
+                      </td>
+                      <td className={td}>
+                        <span className={td_span}>{restaurant.city}</span>
+                      </td>
 
-                  <td className={td}>
-                    <span className={td_span}>{restaurant.state}</span>
-                  </td>
-                  <td className={td}>
-                    <span className={td_span}>{restaurant.city}</span>
-                  </td>
+                      <td className={td}>
+                        <span className={td_span}>{restaurant.cuisine}</span>
+                      </td>
+                      <td className={td}>
+                        <span className={td_span}>{restaurant.food_type}</span>
+                      </td>
+                      <td className={td}>
+                        <div className="relative group flex items-center justify-between">
+                          {/* Edit Restaurant */}
+                          <div className="relative group/edit">
+                            <button
+                              className={action_button}
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                editRestaurant(restaurant);
+                              }}
+                            >
+                              <Pencil className="w-5 h-5" />
+                            </button>
+                          </div>
 
-                  <td className={td}>
-                    <span className={td_span}>{restaurant.cuisine}</span>
-                  </td>
-                  <td className={td}>
-                    <span className={td_span}>{restaurant.food_type}</span>
-                  </td>
-                  <td className={td}>
-                    <div className="relative group flex items-center justify-between">
-                      {/* Edit Restaurant */}
-                      <div className="relative group/edit">
-                        <button
-                          className={action_button}
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            editRestaurant(restaurant);
-                          }}
-                        >
-                          <Pencil className="w-5 h-5" />
-                        </button>
-                      </div>
+                          {/* Switch Restaurant */}
+                          <div className="relative group/switch">
+                            <button
+                              className={action_button}
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                switchRestaurant(restaurant);
+                              }}
+                            >
+                              <UtensilsCrossed className="w-5 h-5" />
+                            </button>
 
-                      {/* Switch Restaurant */}
-                      <div className="relative group/switch">
-                        <button
-                          className={action_button}
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            switchRestaurant(restaurant);
-                          }}
-                        >
-                          <UtensilsCrossed className="w-5 h-5" />
-                        </button>
-
-                        {/* Tooltip */}
-                        <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-3 py-1 bg-gray-800 text-white text-sm rounded-md opacity-0 group-hover/switch:opacity-100 transition-opacity whitespace-nowrap pointer-events-none z-50">
-                          Switch Restaurant
-                          <div className="absolute top-full left-1/2 -translate-x-1/2 border-4 border-transparent border-t-gray-800"></div>
+                            {/* Tooltip */}
+                            <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-3 py-1 bg-gray-800 text-white text-sm rounded-md opacity-0 group-hover/switch:opacity-100 transition-opacity whitespace-nowrap pointer-events-none z-50">
+                              Switch Restaurant
+                              <div className="absolute top-full left-1/2 -translate-x-1/2 border-4 border-transparent border-t-gray-800"></div>
+                            </div>
+                          </div>
                         </div>
-                      </div>
-                    </div>
-                  </td>
-                  <td className={td}>
-                    <span className={td_span}>
-                      {unixToString(restaurant.created_at)}
-                    </span>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-        <div className="flex items-center justify-end p-1 border-t border-slate-200/50 dark:border-slate-700/50">
-          <span className="text-sm text-slate-600 dark:text-slate-300 m-3">
-            Page {page}
-          </span>
-          <button
-            disabled={page === 1}
-            onClick={fecthPreviousCategory}
-            className="px-4 py-2 m-1.5 bg-slate-200 dark:bg-slate-700 rounded-lg disabled:opacity-40 cursor-pointer text-white dark:text-white"
-          >
-            Previous
-          </button>
+                      </td>
+                      <td className={td}>
+                        <span className={td_span}>
+                          {unixToString(restaurant.created_at)}
+                        </span>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+            <div className="flex items-center justify-end p-1 border-t border-slate-200/50 dark:border-slate-700/50">
+              <span className="text-sm text-slate-600 dark:text-slate-300 m-3">
+                Page {page}
+              </span>
+              <button
+                disabled={page === 1}
+                onClick={fecthPreviousCategory}
+                className="px-4 py-2 m-1.5 bg-slate-200 dark:bg-slate-700 rounded-lg disabled:opacity-40 cursor-pointer text-white dark:text-white"
+              >
+                Previous
+              </button>
 
-          <button
-            onClick={fecthNextCategory}
-            className={`${rounded_button} cursor-pointer`}
-          >
-            Next
-          </button>
-        </div>
+              <button
+                onClick={fecthNextCategory}
+                className={`${rounded_button} cursor-pointer`}
+              >
+                Next
+              </button>
+            </div>
+          </>
+        ) : (
+          <span className="text-sm font-medium dark:text-red-300  p-10">
+            Data not available
+          </span>
+        )}
       </div>
     </div>
   );

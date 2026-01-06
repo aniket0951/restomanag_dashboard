@@ -43,13 +43,26 @@ function CreateMenuItems() {
   const { state } = useLocation();
   const stateMenu = state?.menu;
 
+  // Helper function to properly convert any value to boolean
+  const toBoolean = (value: any): boolean => {
+    if (typeof value === "boolean") return value;
+    if (typeof value === "string") return value.toLowerCase() === "true";
+    if (typeof value === "number") return value !== 0;
+    return Boolean(value);
+  };
+
   const {
     register,
     handleSubmit,
     setValue,
     watch,
     formState: { errors, isSubmitting },
-  } = useForm<CategoryMenuItemForm>({});
+  } = useForm<CategoryMenuItemForm>({
+    defaultValues: {
+      is_veg: false,
+      is_available: false,
+    },
+  });
 
   const onSubmit = async (data: CategoryMenuItemForm) => {
     try {
@@ -76,13 +89,19 @@ function CreateMenuItems() {
       setValue("name", stateMenu.name);
       setValue("description", stateMenu.description);
       setValue("price", stateMenu.price);
-      setValue("is_veg", stateMenu.is_veg);
-      setValue("is_available", stateMenu.is_available);
+      setValue("is_veg", toBoolean(stateMenu.is_veg));
+      setValue("is_available", toBoolean(stateMenu.is_available));
       setValue("preparation_time", stateMenu.preparation_time);
       setValue("restaurant_pid", stateMenu.restaurant_pid);
       setValue("half_price", stateMenu.half_price);
       setValue("pid", stateMenu.pid);
       setItemMenuForUpdate(true);
+      console.log(
+        "After setting - is_veg:",
+        watch("is_veg"),
+        "Type:",
+        typeof watch("is_veg"),
+      );
     }
     fetchListMenuCategoryNameByRestaurant();
   }, [stateMenu, setValue]);
@@ -104,6 +123,7 @@ function CreateMenuItems() {
 
   const updateMenuItems = async (data: CategoryMenuItemForm) => {
     try {
+      console.log("Update Request : ", data, watch("is_veg"));
       const res = await postApi<UpdateMenuItemsRes>(
         EndPoint.UpdateMenuItems,
         data,
@@ -227,7 +247,10 @@ function CreateMenuItems() {
 
               <div
                 className="flex items-center cursor-pointer select-none"
-                onClick={() => setValue("is_veg", !watch("is_veg"))}
+                onClick={() => {
+                  const currentValue = watch("is_veg");
+                  setValue("is_veg", !currentValue, { shouldValidate: true });
+                }}
               >
                 <div
                   className={`w-12 h-6 flex items-center rounded-full p-1 transition-all ${
@@ -245,12 +268,6 @@ function CreateMenuItems() {
                   {watch("is_veg") ? "Veg" : "Non-Veg"}
                 </span>
               </div>
-
-              <input
-                type="checkbox"
-                {...register("is_veg")}
-                className="hidden"
-              />
             </div>
 
             <div className="relative z-0 p-3">
