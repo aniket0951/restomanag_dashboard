@@ -2,6 +2,7 @@ import {
   ArrowDownLeft,
   ArrowUpRight,
   BadgeCheck,
+  BarChart3,
   DollarSign,
   Hourglass,
   PackagePlus,
@@ -88,18 +89,26 @@ export function Revenue({ value }: { value: number }) {
   );
 }
 
-export function OrderInit() {
+export function PendingOrders({
+  count,
+  currentPercentage,
+}: {
+  count: number;
+  currentPercentage: number;
+}) {
   return (
     <div className={children_parent_div}>
       <div className="flex items-start justify-between">
         <div className="flex-1">
-          <p className={children_title}>Order Initiated</p>
+          <p className={children_title}>Pending Orders</p>
           <p className="text-2xl font-bold text-slate-800 dark:text-white mb-4">
-            $ 123
+            $ {count}
           </p>
           <div className="flex items-center space-x-2">
             <ArrowDownLeft className="w-4 h-4 text-red-600" />
-            <span className={childern_span_percentage}>25%</span>
+            <span className={childern_span_percentage}>
+              {currentPercentage}%
+            </span>
             <span className="text-sm text-slate-500 dark:text-slate-400">
               vs Yesterday
             </span>
@@ -123,18 +132,26 @@ export function OrderInit() {
   );
 }
 
-export function PendingOrders() {
+export function PreparingOrders({
+  count,
+  currentPercentage,
+}: {
+  count: number;
+  currentPercentage: number;
+}) {
   return (
     <div className={children_parent_div}>
       <div className="flex items-start justify-between">
         <div className="flex-1">
-          <p className={children_title}>Pending Orders</p>
+          <p className={children_title}>Preparing Orders</p>
           <p className="text-2xl font-bold text-slate-800 dark:text-white mb-4">
-            $ 123
+            $ {count}
           </p>
           <div className="flex items-center space-x-2">
             <ArrowDownLeft className="w-4 h-4 text-red-600" />
-            <span className={childern_span_percentage}>25%</span>
+            <span className={childern_span_percentage}>
+              {currentPercentage}%
+            </span>
             <span className="text-sm text-slate-500 dark:text-slate-400">
               vs Yesterday
             </span>
@@ -158,18 +175,114 @@ export function PendingOrders() {
   );
 }
 
-export function CompletedOrders() {
+export function ServeOrders({
+  count,
+  currentPercentage,
+}: {
+  count: number;
+  currentPercentage: number;
+}) {
+  return (
+    <div className={children_parent_div}>
+      <div className="flex items-start justify-between">
+        <div className="flex-1">
+          <p className={children_title}>Serve Orders</p>
+          <p className="text-2xl font-bold text-slate-800 dark:text-white mb-4">
+            $ {count}
+          </p>
+          <div className="flex items-center space-x-2">
+            <ArrowDownLeft className="w-4 h-4 text-red-600" />
+            <span className={childern_span_percentage}>
+              {currentPercentage}%
+            </span>
+            <span className="text-sm text-slate-500 dark:text-slate-400">
+              vs Yesterday
+            </span>
+          </div>
+        </div>
+        <div
+          className={`p-3 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800 group:hover:scale-110 transition-all duration-300`}
+        >
+          <Hourglass className={`${children_doller_sign} dark:text-red-600`} />
+        </div>
+      </div>
+
+      <div className="mt-4 h-2 bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden">
+        <div
+          className={`h-full bg-gradient-to-r from-emerald-500 to-teal-600
+            rounded-full transition-all duration-100`}
+          style={{ width: "75%" }}
+        ></div>
+      </div>
+    </div>
+  );
+}
+
+export function OrderStatus({
+  title,
+  count,
+  currentPercentage,
+}: {
+  title: string;
+  count: number;
+  currentPercentage: number;
+}) {
+  return (
+    <div className={children_parent_div}>
+      <div className="flex items-start justify-between">
+        <div className="flex-1">
+          <p className={children_title}>{title}</p>
+          <p className="text-2xl font-bold text-slate-800 dark:text-white mb-4 flex items-center gap-2">
+            <BarChart3 className="w-5 h-5" />
+            {count}
+          </p>
+          <div className="flex items-center space-x-2">
+            <ArrowDownLeft className="w-4 h-4 text-red-600" />
+            <span className={childern_span_percentage}>
+              {currentPercentage}%
+            </span>
+            <span className="text-sm text-slate-500 dark:text-slate-400">
+              vs Yesterday
+            </span>
+          </div>
+        </div>
+        <div className="p-3 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800 group-hover:scale-110 transition-all duration-300">
+          <PackagePlus className={children_doller_sign} />
+        </div>
+      </div>
+
+      <div className="mt-4 h-2 bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden">
+        <div
+          className={`h-full bg-gradient-to-r from-emerald-500 to-teal-600
+            rounded-full transition-all duration-100`}
+          style={{ width: "75%" }}
+        ></div>
+      </div>
+    </div>
+  );
+}
+
+export function CompletedOrders({
+  totalOrders,
+  currentPercentage,
+}: {
+  totalOrders: number;
+  currentPercentage: number;
+}) {
   return (
     <div className={children_parent_div}>
       <div className="flex items-start justify-between">
         <div className="flex-1">
           <p className={children_title}>Completed Orders</p>
           <p className="text-2xl font-bold text-slate-800 dark:text-white mb-4">
-            $ 123
+            $ {totalOrders}
           </p>
           <div className="flex items-center space-x-2">
             <ArrowDownLeft className="w-4 h-4 text-red-600" />
-            <span className={childern_span_percentage}>25%</span>
+            <span className={childern_span_percentage}>
+              {" "}
+              {currentPercentage}%
+            </span>
             <span className="text-sm text-slate-500 dark:text-slate-400">
               vs Yesterday
             </span>

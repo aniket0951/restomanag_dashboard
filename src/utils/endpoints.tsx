@@ -6,6 +6,7 @@ const MenuItems = Restaurant + "menu/item/";
 const OwnerLastActivity = BASE_URL + "/activity";
 const Tables = Restaurant + "table";
 const Empls = Restaurant + "empl";
+const Orders = BASE_URL + "/order";
 
 export const EndPoint = {
   CreateOwnerAccount: `${BASE_URL}/owner/`,
@@ -43,4 +44,10 @@ export const EndPoint = {
   DeleteEmpl: `${Empls}/delete/`,
   CreateEmpl: `${Empls}/create`,
   UpdateEmpl: `${Empls}/update`,
+  ListEmplByRoleAndResto: `${Empls}/list/role`,
+
+  // Orders
+  ListOrdersByRestaurantAndStatus: `${Orders}/list/restaurant`,
+  CountActiveOrdersByRestaurantAndStatus: `${Orders}/active/count`,
+  GetOrdersFullDetails: `${Orders}/details`,
 };

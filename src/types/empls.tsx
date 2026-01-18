@@ -33,3 +33,13 @@ export interface EmployeeAttendanceRes {
   in_time: string;
   out_time: string;
 }
+
+export interface ListEmplsByRoleAndRestoRes {
+  pid: string;
+  restaurant_pid: string;
+  name: string;
+  email: string;
+  contact_number: string;
+  empl_code: string;
+  role: string;
+}
