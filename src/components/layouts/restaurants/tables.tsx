@@ -2,8 +2,20 @@ import { useEffect, useState } from "react";
 import { getApi, postApi } from "../../../utils/api";
 import type { ListRestaurantTablesRes } from "../../../types/restaurant";
 import { EndPoint } from "../../../utils/endpoints";
-import { rounded_button } from "../../../utils/csstags";
-import { Trash2, Plus, PencilIcon } from "lucide-react";
+import {
+  Trash2,
+  Plus,
+  PencilIcon,
+  LayoutGrid,
+  Search,
+  Users,
+  CheckCircle,
+  XCircle,
+  Calendar,
+  QrCode,
+  Download,
+  Hash,
+} from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { unixToString } from "../../../utils/utils";
 import { LocalStorageKey } from "../../../utils/constants";
@@ -11,16 +23,31 @@ import toast from "react-hot-toast/headless";
 import QRCode from "qrcode";
 import { restaurantStore } from "../../../store/user_store";
 
-const th_class: string =
-  "text-left p-4 text-sm font-semibold text-white border-r border-slate-200 dark:border-slate-700";
-const td: string = "p-4 border-r border-slate-200 dark:border-slate-700 w-sm";
-const td_span: string =
-  "text-gray-400 dark:text-gray-400 font-medium font-sans";
-const parent_div: string =
-  "bg-white/80 bg-slate-800 dark:bg-slate-800 rounded-xl backdrop-blur-xl overflow-hidden w-full p-2 m-3 border border-slate-200/50 dark:border-slate-700/50";
-
-const action_button: string =
-  "relative w-full  rounded-xl text-slate-600 dark:text-slate-300  transition-colors";
+const getStatusConfig = (status: string) => {
+  const lowerStatus = status?.toLowerCase() || "";
+  if (lowerStatus === "available") {
+    return {
+      icon: CheckCircle,
+      bg: "bg-emerald-500/10",
+      text: "text-emerald-400",
+      border: "border-emerald-500/30",
+    };
+  }
+  if (lowerStatus === "occupied") {
+    return {
+      icon: XCircle,
+      bg: "bg-red-500/10",
+      text: "text-red-400",
+      border: "border-red-500/30",
+    };
+  }
+  return {
+    icon: CheckCircle,
+    bg: "bg-slate-500/10",
+    text: "text-slate-400",
+    border: "border-slate-500/30",
+  };
+};
 type Params = {
   restaurantID: string | null;
 };
@@ -134,182 +161,246 @@ function Tables({ restaurantID }: Params) {
 
   return (
     <>
-      {restauranTables.length > 0 ? (
-        <div className={parent_div}>
-          <div className="p-6 border-b border-slate-200/50 dark:border-slate-700/50">
-            <div className="flex items-center justify-between">
-              <div>
-                <h3 className="text-lg font-bold text-slate-800 dark:text-white">
-                  Restaurant Tables
-                </h3>
-              </div>
-              <button
-                className={`${rounded_button} cursor-pointer`}
-                onClick={() => navigate("/dashboard/table/create")}
-              >
-                <Plus className="w-4 h-4" />
-                <span className="text-sm font-medium">Add New</span>
-              </button>
+    <div className="bg-gradient-to-br from-slate-800/90 to-slate-900/90 backdrop-blur-xl rounded-2xl border border-white/10 shadow-xl overflow-hidden">
+      {/* Header */}
+      <div className="p-4 border-b border-white/10 bg-white/5">
+        <div className="flex flex-wrap items-center gap-4">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-teal-500 to-cyan-600 flex items-center justify-center shadow-lg">
+              <LayoutGrid className="w-5 h-5 text-white" />
+            </div>
+            <div>
+              <h3 className="text-lg font-bold text-white">Restaurant Tables</h3>
+              <p className="text-xs text-slate-400">
+                {restauranTables.length} tables found
+              </p>
             </div>
           </div>
 
+          {/* Search */}
+          <div className="flex-1 max-w-md ml-auto">
+            <div className="relative">
+              <Search className="w-4 h-4 absolute left-3 top-1/2 transform -translate-y-1/2 text-slate-400" />
+              <input
+                type="text"
+                placeholder="Search tables..."
+                className="w-full pl-10 pr-4 py-2.5 bg-white/5 border border-white/10 rounded-xl text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-teal-500/50 focus:border-teal-500/50 transition-all"
+              />
+            </div>
+          </div>
+
+          <button
+            className="flex items-center gap-2 px-4 py-2.5 bg-gradient-to-r from-teal-500 to-cyan-600 hover:from-teal-600 hover:to-cyan-700 text-white text-sm font-medium rounded-xl shadow-lg shadow-teal-500/25 transition-all duration-200"
+            onClick={() => navigate("/dashboard/table/create")}
+          >
+            <Plus className="w-4 h-4" />
+            <span>Add Table</span>
+          </button>
+        </div>
+      </div>
+
+      {restauranTables.length > 0 ? (
+        <>
+          {/* Table */}
           <div className="overflow-auto max-h-[calc(600px-80px)]">
             <table className="w-full">
-              <thead className="border-b border-slate-300 dark:border-slate-700">
+              <thead className="bg-gradient-to-r from-slate-700/50 to-slate-800/50 sticky top-0">
                 <tr>
-                  <th className={th_class}>ID</th>
-                  <th className={th_class}> Table Number </th>
-                  <th className={th_class}> Table Capacity </th>
-                  <th className={th_class}> Status </th>
-                  <th className={th_class}> Created At</th>
-                  <th className={th_class}> Action </th>
-                  <th className={th_class}> Table QR </th>
+                  <th className="text-left py-4 px-4 text-xs font-semibold text-slate-300 uppercase tracking-wider">
+                    #
+                  </th>
+                  <th className="text-left py-4 px-4 text-xs font-semibold text-slate-300 uppercase tracking-wider">
+                    Table
+                  </th>
+                  <th className="text-center py-4 px-4 text-xs font-semibold text-slate-300 uppercase tracking-wider">
+                    Capacity
+                  </th>
+                  <th className="text-center py-4 px-4 text-xs font-semibold text-slate-300 uppercase tracking-wider">
+                    Status
+                  </th>
+                  <th className="text-center py-4 px-4 text-xs font-semibold text-slate-300 uppercase tracking-wider">
+                    Created
+                  </th>
+                  <th className="text-center py-4 px-4 text-xs font-semibold text-slate-300 uppercase tracking-wider">
+                    Actions
+                  </th>
+                  <th className="text-center py-4 px-4 text-xs font-semibold text-slate-300 uppercase tracking-wider">
+                    QR Code
+                  </th>
                 </tr>
               </thead>
               <tbody>
-                {restauranTables.map((menu, index) => (
-                  <tr
-                    className="cursor-pointer border-b border-slate-200/50 dark:border-slate-700/50
-          hover:bg-slate-50/50 dark:hover:bg-slate-700/20 transition-colors"
-                    key={menu.pid}
-                  >
-                    <td className={td}>
-                      <span className={td_span}>{index + 1}</span>
-                    </td>
-                    <td className={td}>
-                      <span className={td_span}>
-                        {menu?.number ? `Table_${menu.number}` : "NA"}
-                      </span>
-                    </td>
-
-                    <td className={td}>
-                      <span className={td_span}>
-                        {menu?.number ? `${menu.capacity} Person` : "NA"}
-                      </span>
-                    </td>
-
-                    <td className={td}>
-                      <span
-                        className={`${
-                          menu?.status === "available"
-                            ? "text-green-600 dark:text-green-600"
-                            : menu?.status === "occupied"
-                              ? "text-red-600"
-                              : ""
-                        } capitalize ${td_span}`}
-                      >
-                        {menu?.status ? menu.status : "NA"}
-                      </span>
-                    </td>
-                    <td className={td}>
-                      <span className={td_span}>
-                        {menu?.status ? unixToString(menu.created_at) : "NA"}
-                      </span>
-                    </td>
-
-                    <td className={td}>
-                      <div className="flex">
-                        <button
-                          className={action_button}
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            editMenuItem(menu);
-                          }}
+                {restauranTables.map((table, index) => {
+                  const statusConfig = getStatusConfig(table.status);
+                  const StatusIcon = statusConfig.icon;
+                  return (
+                    <tr
+                      className={`border-b border-white/5 hover:bg-white/5 transition-all duration-200 ${index % 2 === 0 ? "bg-white/[0.02]" : ""}`}
+                      key={table.pid}
+                    >
+                      <td className="py-4 px-4">
+                        <span className="text-slate-500 text-sm">
+                          {(page - 1) * 10 + index + 1}
+                        </span>
+                      </td>
+                      <td className="py-4 px-4">
+                        <div className="flex items-center gap-3">
+                          <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-teal-500/20 to-cyan-500/20 flex items-center justify-center">
+                            <Hash className="w-5 h-5 text-teal-400" />
+                          </div>
+                          <div>
+                            <p className="text-sm font-medium text-slate-100">
+                              Table {table.number}
+                            </p>
+                            <p className="text-xs text-slate-500">
+                              ID: {table.pid?.slice(0, 8)}...
+                            </p>
+                          </div>
+                        </div>
+                      </td>
+                      <td className="py-4 px-4 text-center">
+                        <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-lg bg-white/10 text-slate-200 text-sm font-medium">
+                          <Users className="w-3.5 h-3.5 text-cyan-400" />
+                          {table.capacity} Person
+                        </span>
+                      </td>
+                      <td className="py-4 px-4 text-center">
+                        <span
+                          className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium capitalize ${statusConfig.bg} ${statusConfig.text} border ${statusConfig.border}`}
                         >
-                          <span className="flex  justify-center cursor-pointer">
-                            <PencilIcon className="w-4 h-5 text-green-600" />
+                          <StatusIcon className="w-3 h-3" />
+                          {table.status || "N/A"}
+                        </span>
+                      </td>
+                      <td className="py-4 px-4 text-center">
+                        <div className="flex items-center justify-center gap-1.5 text-slate-400">
+                          <Calendar className="w-3.5 h-3.5" />
+                          <span className="text-sm">
+                            {unixToString(table.created_at)}
                           </span>
-                        </button>
+                        </div>
+                      </td>
+                      <td className="py-4 px-4">
+                        <div className="flex items-center justify-center gap-1">
+                          <button
+                            className="p-2 rounded-lg bg-emerald-500/10 text-emerald-400 hover:bg-emerald-500/20 transition-all duration-200"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              editMenuItem(table);
+                            }}
+                            title="Edit Table"
+                          >
+                            <PencilIcon className="w-4 h-4" />
+                          </button>
+                          <button
+                            className="p-2 rounded-lg bg-red-500/10 text-red-400 hover:bg-red-500/20 transition-all duration-200"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              setSelectedItemId(table.pid);
+                              setShowConfirm(true);
+                            }}
+                            title="Delete Table"
+                          >
+                            <Trash2 className="w-4 h-4" />
+                          </button>
+                        </div>
+                      </td>
+                      <td className="py-4 px-4 text-center">
                         <button
-                          className={action_button}
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            setSelectedItemId(menu.pid);
-                            setShowConfirm(true);
-                          }}
+                          className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-gradient-to-r from-violet-500/20 to-purple-500/20 text-violet-400 hover:from-violet-500/30 hover:to-purple-500/30 border border-violet-500/30 text-xs font-medium transition-all duration-200"
+                          onClick={() => downloadQR(table)}
                         >
-                          <span className="flex w-10 justify-center cursor-pointer">
-                            <Trash2 className="w-4 h-5 text-red-500" />
-                          </span>
+                          <QrCode className="w-3.5 h-3.5" />
+                          Generate
                         </button>
-                      </div>
-                    </td>
-                    <td className={td}>
-                      <button
-                        className={`${action_button} cursor-pointer hover:bg-slate-100 dark:hover:bg-slate-800 p-2`}
-                        onClick={() => downloadQR(menu)}
-                      >
-                        Download
-                      </button>
-                    </td>
-                  </tr>
-                ))}
+                      </td>
+                    </tr>
+                  );
+                })}
               </tbody>
             </table>
           </div>
-          <div className="flex items-center justify-end p-1 border-t border-slate-200/50 dark:border-slate-700/50">
-            <span className="text-sm text-slate-600 dark:text-slate-300 m-3">
-              {page}
-            </span>
-            <button
-              disabled={page === 1}
-              onClick={fecthPreviousCategory}
-              className="px-4 py-2 m-1.5 bg-slate-200 dark:bg-slate-700 rounded-lg disabled:opacity-40 cursor-pointer text-white dark:text-white"
-            >
-              Previous
-            </button>
 
-            <button
-              onClick={fecthNextCategory}
-              className={`${rounded_button} cursor-pointer`}
-            >
-              Next
-            </button>
-          </div>
-        </div>
-      ) : (
-        <div className={parent_div}>
-          <div className="p-3.5">
-            <div className="flex items-center justify-between">
-              <h1 className="text-white dark:text-white font-semibold">
-                Restaurant Tables
-              </h1>
+          {/* Pagination */}
+          <div className="flex items-center justify-between p-4 border-t border-white/10 bg-white/5">
+            <span className="text-sm text-slate-400">
+              Page <span className="font-medium text-slate-200">{page}</span>
+            </span>
+            <div className="flex items-center gap-2">
               <button
-                className={`${rounded_button} cursor-pointer`}
-                onClick={() => navigate("/dashboard/table/create")}
+                disabled={page === 1}
+                onClick={fecthPreviousCategory}
+                className="px-4 py-2 bg-white/5 hover:bg-white/10 disabled:opacity-40 disabled:cursor-not-allowed border border-white/10 rounded-lg text-sm text-slate-300 transition-all duration-200"
               >
-                <Plus className="w-4 h-4" />
-                <span className="text-sm font-medium">Add New</span>
+                Previous
+              </button>
+              <button
+                onClick={fecthNextCategory}
+                className="px-4 py-2 bg-gradient-to-r from-teal-500 to-cyan-600 hover:from-teal-600 hover:to-cyan-700 rounded-lg text-sm text-white font-medium shadow-lg shadow-teal-500/25 transition-all duration-200"
+              >
+                Next
               </button>
             </div>
-            <span className="text-sm font-medium dark:text-red-300">
-              Data not available
-            </span>
+          </div>
+        </>
+      ) : (
+        /* Empty State */
+        <div className="py-16 text-center">
+          <div className="flex flex-col items-center gap-4">
+            <div className="w-20 h-20 rounded-full bg-white/5 flex items-center justify-center">
+              <LayoutGrid className="w-10 h-10 text-slate-500" />
+            </div>
+            <div>
+              <p className="text-slate-300 font-medium">No tables found</p>
+              <p className="text-sm text-slate-500 mt-1">
+                Get started by adding your first table
+              </p>
+            </div>
+            <button
+              className="flex items-center gap-2 px-4 py-2.5 bg-gradient-to-r from-teal-500 to-cyan-600 hover:from-teal-600 hover:to-cyan-700 text-white text-sm font-medium rounded-xl shadow-lg shadow-teal-500/25 transition-all duration-200 mt-2"
+              onClick={() => navigate("/dashboard/table/create")}
+            >
+              <Plus className="w-4 h-4" />
+              <span>Add Table</span>
+            </button>
           </div>
         </div>
       )}
-      {showConfirm && (
-        <div className="fixed inset-0 flex items-center justify-center bg-black/50 z-50">
-          <div className="bg-white p-6 rounded-xl shadow-xl w-80">
-            <h3 className="text-lg font-semibold mb-4">Confirm Delete</h3>
-            <p className="text-sm text-gray-600 mb-6">
-              Are you sure you want to delete this table?
-            </p>
+      </div>
 
-            <div className="flex justify-end space-x-3">
+      {/* Delete Confirmation Modal */}
+      {showConfirm && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center">
+          <div
+            className="absolute inset-0 bg-black/60 backdrop-blur-sm"
+            onClick={() => setShowConfirm(false)}
+          />
+          <div className="relative w-full max-w-sm mx-4 bg-gradient-to-br from-slate-800 to-slate-900 border border-white/10 rounded-2xl shadow-2xl overflow-hidden">
+            <div className="p-5 text-center">
+              <div className="w-14 h-14 mx-auto mb-4 rounded-full bg-gradient-to-br from-red-500/20 to-red-600/20 flex items-center justify-center">
+                <Trash2 className="w-7 h-7 text-red-400" />
+              </div>
+              <h3 className="text-lg font-semibold text-slate-100 mb-2">
+                Delete Table
+              </h3>
+              <p className="text-sm text-slate-400">
+                Are you sure you want to delete this table? This action cannot
+                be undone.
+              </p>
+            </div>
+            <div className="flex gap-3 p-4 border-t border-white/10 bg-white/5">
               <button
                 onClick={() => setShowConfirm(false)}
-                className="px-4 py-2 rounded-lg bg-gray-200 hover:bg-gray-300"
+                className="flex-1 px-4 py-2.5 bg-white/5 hover:bg-white/10 border border-white/10 text-slate-300 text-sm font-medium rounded-lg transition-all duration-200"
               >
                 Cancel
               </button>
-
               <button
                 onClick={() => {
                   deleteTable(selectedItemId);
                   setShowConfirm(false);
                 }}
-                className="px-4 py-2 rounded-lg bg-red-500 text-white hover:bg-red-600"
+                className="flex-1 px-4 py-2.5 bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 text-white text-sm font-medium rounded-lg shadow-lg shadow-red-500/25 transition-all duration-200"
               >
                 Delete
               </button>
@@ -317,44 +408,73 @@ function Tables({ restaurantID }: Params) {
           </div>
         </div>
       )}
-      {showQRModal && (
-        <div className="fixed inset-0 flex items-center justify-center bg-black/50 z-50">
-          <div className="bg-white dark:bg-slate-800 p-6 rounded-xl shadow-xl w-96">
-            <h3 className="text-lg font-semibold mb-4 text-slate-800 dark:text-white">
-              Table QR Code
-            </h3>
-            {selectedTable && (
-              <div className="mb-4">
-                <p className="text-sm text-slate-600 dark:text-slate-300">
-                  Table Number:{" "}
-                  <span className="font-semibold">
-                    Table_{selectedTable.number}
-                  </span>
-                </p>
-                <p className="text-sm text-slate-600 dark:text-slate-300">
-                  Capacity:{" "}
-                  <span className="font-semibold">
-                    {selectedTable.capacity} Person
-                  </span>
-                </p>
-              </div>
-            )}
-            <div className="flex justify-center mb-6 bg-white p-4 rounded-lg">
-              <img src={qrCodeData} alt="QR Code" className="w-64 h-64" />
-            </div>
 
-            <div className="flex justify-end space-x-3">
+      {/* QR Code Modal */}
+      {showQRModal && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center p-4 overflow-y-auto"
+          onClick={() => setShowQRModal(false)}
+        >
+          <div className="fixed inset-0 bg-black/60 backdrop-blur-sm" />
+          <div
+            className="relative w-full max-w-sm bg-gradient-to-br from-slate-800 to-slate-900 border border-white/10 rounded-2xl shadow-2xl my-auto"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="p-5">
+              <div className="flex items-center gap-3 mb-4">
+                <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-violet-500/20 to-purple-500/20 flex items-center justify-center">
+                  <QrCode className="w-5 h-5 text-violet-400" />
+                </div>
+                <div>
+                  <h3 className="text-lg font-semibold text-slate-100">
+                    Table QR Code
+                  </h3>
+                  {selectedTable && (
+                    <p className="text-xs text-slate-400">
+                      Table {selectedTable.number} • {selectedTable.capacity}{" "}
+                      Person
+                    </p>
+                  )}
+                </div>
+              </div>
+
+              <div className="bg-white p-4 rounded-xl mb-4">
+                <img
+                  src={qrCodeData}
+                  alt="QR Code"
+                  className="w-full h-auto"
+                />
+              </div>
+
+              {selectedTable && (
+                <div className="grid grid-cols-2 gap-3 mb-4">
+                  <div className="bg-white/5 rounded-lg p-3">
+                    <p className="text-xs text-slate-500 mb-1">Table Number</p>
+                    <p className="text-sm font-medium text-slate-200">
+                      Table {selectedTable.number}
+                    </p>
+                  </div>
+                  <div className="bg-white/5 rounded-lg p-3">
+                    <p className="text-xs text-slate-500 mb-1">Capacity</p>
+                    <p className="text-sm font-medium text-slate-200">
+                      {selectedTable.capacity} Person
+                    </p>
+                  </div>
+                </div>
+              )}
+            </div>
+            <div className="flex gap-3 p-4 border-t border-white/10 bg-white/5">
               <button
                 onClick={() => setShowQRModal(false)}
-                className="px-4 py-2 rounded-lg bg-gray-200 dark:bg-slate-700 hover:bg-gray-300 dark:hover:bg-slate-600 text-slate-800 dark:text-white"
+                className="flex-1 px-4 py-2.5 bg-white/5 hover:bg-white/10 border border-white/10 text-slate-300 text-sm font-medium rounded-lg transition-all duration-200"
               >
                 Cancel
               </button>
-
               <button
                 onClick={handleDownloadQR}
-                className="px-4 py-2 rounded-lg bg-blue-500 text-white hover:bg-blue-600"
+                className="flex-1 px-4 py-2.5 bg-gradient-to-r from-violet-500 to-purple-600 hover:from-violet-600 hover:to-purple-700 text-white text-sm font-medium rounded-lg shadow-lg shadow-violet-500/25 transition-all duration-200 flex items-center justify-center gap-2"
               >
+                <Download className="w-4 h-4" />
                 Download
               </button>
             </div>
