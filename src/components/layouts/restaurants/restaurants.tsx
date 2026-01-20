@@ -64,9 +64,14 @@ function Restaurants() {
       const res = await getApi<ListRestaurantsRes[]>(
         EndPoint.ListRestaurant + "?page=" + page,
       );
-      setRestaurants(res.data);
+      if (res.status_code === 200 && Array.isArray(res.data) && res.data.length > 0) {
+        setRestaurants(res.data);
+      } else {
+        setRestaurants([]);
+      }
     } catch (err) {
       console.error(err);
+      setRestaurants([]);
     }
   };
 
@@ -312,16 +317,27 @@ function Restaurants() {
                   No restaurants found
                 </p>
                 <p className="text-sm text-slate-500 mt-1">
-                  Get started by adding your first restaurant
+                  {page > 1
+                    ? "No more restaurants on this page"
+                    : "Get started by adding your first restaurant"}
                 </p>
               </div>
-              <button
-                className="flex items-center gap-2 px-4 py-2.5 bg-gradient-to-r from-orange-500 to-red-600 hover:from-orange-600 hover:to-red-700 text-white text-sm font-medium rounded-xl shadow-lg shadow-orange-500/25 transition-all duration-200 mt-2"
-                onClick={() => createRestaurant()}
-              >
-                <Plus className="w-4 h-4" />
-                <span>Add Restaurant</span>
-              </button>
+              {page > 1 ? (
+                <button
+                  onClick={fecthPreviousCategory}
+                  className="flex items-center gap-2 px-4 py-2.5 bg-white/5 hover:bg-white/10 border border-white/10 text-slate-300 text-sm font-medium rounded-xl transition-all duration-200 mt-2"
+                >
+                  <span>← Go Back</span>
+                </button>
+              ) : (
+                <button
+                  className="flex items-center gap-2 px-4 py-2.5 bg-gradient-to-r from-orange-500 to-red-600 hover:from-orange-600 hover:to-red-700 text-white text-sm font-medium rounded-xl shadow-lg shadow-orange-500/25 transition-all duration-200 mt-2"
+                  onClick={() => createRestaurant()}
+                >
+                  <Plus className="w-4 h-4" />
+                  <span>Add Restaurant</span>
+                </button>
+              )}
             </div>
           </div>
         )}

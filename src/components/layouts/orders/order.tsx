@@ -174,6 +174,8 @@ function Orders() {
 
     if (res.status_code == 200 && res.data) {
       setOrders(res.data);
+    } else {
+      setOrders([]);
     }
   };
 

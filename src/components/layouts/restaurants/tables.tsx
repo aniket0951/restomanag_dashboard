@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { getApi, postApi } from "../../../utils/api";
 import type { ListRestaurantTablesRes } from "../../../types/restaurant";
 import { EndPoint } from "../../../utils/endpoints";
@@ -51,10 +51,10 @@ const getStatusConfig = (status: string) => {
 type Params = {
   restaurantID: string | null;
 };
+const ITEMS_PER_PAGE = 10;
+
 function Tables({ restaurantID }: Params) {
-  const [restauranTables, setRestauranTables] = useState<
-    ListRestaurantTablesRes[]
-  >([]);
+  const [allTables, setAllTables] = useState<ListRestaurantTablesRes[]>([]);
   const [page, setPage] = useState(1);
   const navigate = useNavigate();
   const [showConfirm, setShowConfirm] = useState(false);
@@ -64,17 +64,18 @@ function Tables({ restaurantID }: Params) {
   const [selectedTable, setSelectedTable] =
     useState<ListRestaurantTablesRes | null>(null);
   const restoStore = restaurantStore((state) => state.restaurant);
+
+  // Client-side pagination
+  const startIndex = (page - 1) * ITEMS_PER_PAGE;
+  const restauranTables = allTables.slice(startIndex, startIndex + ITEMS_PER_PAGE);
+
   const fecthNextCategory = () => setPage((p) => p + 1);
 
   const fecthPreviousCategory = () => {
     setPage((p) => Math.max(p - 1, 1));
   };
 
-  useEffect(() => {
-    fetchRestaurantTables();
-  }, [page]);
-
-  const fetchRestaurantTables = async () => {
+  const fetchRestaurantTables = useCallback(async () => {
     try {
       let restaurant_pid: string = "";
 
@@ -91,11 +92,19 @@ function Tables({ restaurantID }: Params) {
       const res = await getApi<ListRestaurantTablesRes[]>(
         EndPoint.ListRestaurantTables + restaurant_pid,
       );
-      setRestauranTables(res.data);
+      if (res.status_code === 200 && Array.isArray(res.data) && res.data.length > 0) {
+        setAllTables(res.data);
+      } else {
+        setAllTables([]);
+      }
     } catch {
-      console.log();
+      setAllTables([]);
     }
-  };
+  }, [restaurantID]);
+
+  useEffect(() => {
+    fetchRestaurantTables();
+  }, [fetchRestaurantTables]);
 
   const editMenuItem = async (currentTable: ListRestaurantTablesRes) => {
     navigate("/dashboard/table/create", {
@@ -172,7 +181,7 @@ function Tables({ restaurantID }: Params) {
             <div>
               <h3 className="text-lg font-bold text-white">Restaurant Tables</h3>
               <p className="text-xs text-slate-400">
-                {restauranTables.length} tables found
+                {allTables.length} tables found
               </p>
             </div>
           </div>
@@ -353,16 +362,27 @@ function Tables({ restaurantID }: Params) {
             <div>
               <p className="text-slate-300 font-medium">No tables found</p>
               <p className="text-sm text-slate-500 mt-1">
-                Get started by adding your first table
+                {page > 1
+                  ? "No more tables on this page"
+                  : "Get started by adding your first table"}
               </p>
             </div>
-            <button
-              className="flex items-center gap-2 px-4 py-2.5 bg-gradient-to-r from-teal-500 to-cyan-600 hover:from-teal-600 hover:to-cyan-700 text-white text-sm font-medium rounded-xl shadow-lg shadow-teal-500/25 transition-all duration-200 mt-2"
-              onClick={() => navigate("/dashboard/table/create")}
-            >
-              <Plus className="w-4 h-4" />
-              <span>Add Table</span>
-            </button>
+            {page > 1 ? (
+              <button
+                onClick={fecthPreviousCategory}
+                className="flex items-center gap-2 px-4 py-2.5 bg-white/5 hover:bg-white/10 border border-white/10 text-slate-300 text-sm font-medium rounded-xl transition-all duration-200 mt-2"
+              >
+                <span>← Go Back</span>
+              </button>
+            ) : (
+              <button
+                className="flex items-center gap-2 px-4 py-2.5 bg-gradient-to-r from-teal-500 to-cyan-600 hover:from-teal-600 hover:to-cyan-700 text-white text-sm font-medium rounded-xl shadow-lg shadow-teal-500/25 transition-all duration-200 mt-2"
+                onClick={() => navigate("/dashboard/table/create")}
+              >
+                <Plus className="w-4 h-4" />
+                <span>Add Table</span>
+              </button>
+            )}
           </div>
         </div>
       )}

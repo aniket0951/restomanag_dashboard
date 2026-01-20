@@ -66,7 +66,7 @@ function Employees() {
 
   useEffect(() => {
     fecthEmpls();
-  }, []);
+  }, [page]);
 
   const fecthEmpls = async () => {
     try {
@@ -81,9 +81,13 @@ function Employees() {
         "&page=" +
         page;
       const res = await getApi<ListEmployeesByRestaurant[]>(endpoint);
-      setEmpls(res.data);
+      if (res.status_code === 200 && Array.isArray(res.data) && res.data.length > 0) {
+        setEmpls(res.data);
+      } else {
+        setEmpls([]);
+      }
     } catch {
-      console.log();
+      setEmpls([]);
     }
   };
 
@@ -318,16 +322,27 @@ function Employees() {
             <div>
               <p className="text-slate-300 font-medium">No employees found</p>
               <p className="text-sm text-slate-500 mt-1">
-                Get started by adding your first employee
+                {page > 1
+                  ? "No more employees on this page"
+                  : "Get started by adding your first employee"}
               </p>
             </div>
-            <button
-              className="flex items-center gap-2 px-4 py-2.5 bg-gradient-to-r from-blue-500 to-indigo-600 hover:from-blue-600 hover:to-indigo-700 text-white text-sm font-medium rounded-xl shadow-lg shadow-blue-500/25 transition-all duration-200 mt-2"
-              onClick={() => navigate("/dashboard/empl/create")}
-            >
-              <Plus className="w-4 h-4" />
-              <span>Add Employee</span>
-            </button>
+            {page > 1 ? (
+              <button
+                onClick={fecthPreviousCategory}
+                className="flex items-center gap-2 px-4 py-2.5 bg-white/5 hover:bg-white/10 border border-white/10 text-slate-300 text-sm font-medium rounded-xl transition-all duration-200 mt-2"
+              >
+                <span>← Go Back</span>
+              </button>
+            ) : (
+              <button
+                className="flex items-center gap-2 px-4 py-2.5 bg-gradient-to-r from-blue-500 to-indigo-600 hover:from-blue-600 hover:to-indigo-700 text-white text-sm font-medium rounded-xl shadow-lg shadow-blue-500/25 transition-all duration-200 mt-2"
+                onClick={() => navigate("/dashboard/empl/create")}
+              >
+                <Plus className="w-4 h-4" />
+                <span>Add Employee</span>
+              </button>
+            )}
           </div>
         </div>
       )}
