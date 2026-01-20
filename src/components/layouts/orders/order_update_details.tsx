@@ -10,11 +10,6 @@ import toast from "react-hot-toast/headless";
 import { OrderTags, QueryParams } from "./queryparams";
 import type { GetOrderFullDetailsRes } from "../../../types/orders";
 import ShowOrderDetails from "./show_order_details";
-const form_label: string =
-  "block mb-2.5 text-sm font-black text-heading dark:text-white";
-
-const form_input: string =
-  "block w-full mt-2 rounded-md bg-white/5 px-3 py-2 text-base text-gray-400 dark:text-gray-400 outline-1 outline-white/10 placeholder:text-gray-400 focus:outline-2 focus:outline-slate-200/50 sm:text-sm";
 
 type CreateRestaurantTableForm = {
   number: string;
@@ -26,7 +21,6 @@ type CreateRestaurantTableForm = {
 
 function DisplayAndUpdateOrder() {
   const navigate = useNavigate();
-  const [itemMenuForUpdate, setItemMenuForUpdate] = useState(false);
   const [orderFullDetails, setOrderFullDetails] =
     useState<GetOrderFullDetailsRes>();
   const { state } = useLocation();
