@@ -3,10 +3,22 @@ import type { GetOrderFullDetailsRes } from "../../../types/orders";
 import { form_class } from "../../../utils/csstags";
 import { formatOrderId, unixToString } from "../../../utils/utils";
 
-export const card_class: string =
+const card_class: string =
   "w-full border border-white/10 rounded-xl p-4 shadow-lg bg-gradient-to-br from-white/10 to-white/5 backdrop-blur-md dark:from-slate-800/60 dark:to-slate-800/40 hover:shadow-xl hover:border-white/20 transition-all duration-300";
 
-function ShowOrderDetails({ order }: { order: GetOrderFullDetailsRes }) {
+type EditOrderDetailsProps = {
+  order: GetOrderFullDetailsRes;
+  onAssignWaiter: () => void;
+  onRemoveItem: (itemPid: string) => void;
+  isLoadingWaiters?: boolean;
+};
+
+function EditOrderDetails({
+  order,
+  onAssignWaiter,
+  onRemoveItem,
+  isLoadingWaiters = false,
+}: EditOrderDetailsProps) {
   const navigate = useNavigate();
 
   const getStatusColor = (status: string) => {
@@ -25,6 +37,7 @@ function ShowOrderDetails({ order }: { order: GetOrderFullDetailsRes }) {
         return "bg-gray-100 text-gray-800 shadow-sm";
     }
   };
+
   return (
     <div className={`${form_class} max-w-4xl mx-auto`}>
       {/* Header */}
@@ -62,100 +75,218 @@ function ShowOrderDetails({ order }: { order: GetOrderFullDetailsRes }) {
             </p>
           </div>
         </div>
-        <span
-          className={`px-4 py-1.5 rounded-full text-sm font-semibold ${getStatusColor(order.order_obj.status)} capitalize`}
-        >
-          {order.order_obj.status}
-        </span>
+        <div className="flex items-center gap-2">
+          <span className="text-xs text-slate-400 bg-white/10 px-2 py-1 rounded-full">
+            Edit Mode
+          </span>
+          <span
+            className={`px-4 py-1.5 rounded-full text-sm font-semibold ${getStatusColor(order.order_obj.status)} capitalize`}
+          >
+            {order.order_obj.status}
+          </span>
+        </div>
       </div>
       <div className="h-px bg-gradient-to-r from-transparent via-white/20 to-transparent mt-4" />
+
       {/* Customer & Waiter Info */}
       <div className="flex flex-col md:flex-row gap-4 mt-4">
-        {/* CustomerInfo */}
-        <div className={`${card_class} flex-1`}>
+        {/* CustomerInfo - Read Only */}
+        <div className={`${card_class} flex-1 opacity-75`}>
           <div className="flex items-center gap-2 mb-4 pb-2 border-b border-white/10">
             <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-blue-500/20 to-blue-600/20 flex items-center justify-center">
-              <svg className="w-4 h-4 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+              <svg
+                className="w-4 h-4 text-blue-400"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
+                />
               </svg>
             </div>
-            <span className="text-sm font-semibold text-slate-300">Customer</span>
+            <span className="text-sm font-semibold text-slate-300">
+              Customer
+            </span>
+            <span className="ml-auto text-xs text-slate-500 bg-white/5 px-2 py-1 rounded-full">
+              Read Only
+            </span>
           </div>
           <div className="space-y-3">
             <div className="group">
-              <p className="text-xs text-slate-500 uppercase tracking-wider">Name</p>
+              <p className="text-xs text-slate-500 uppercase tracking-wider">
+                Name
+              </p>
               <p className="text-sm font-medium text-slate-100 mt-0.5">
                 {order.customer_details.name}
               </p>
             </div>
             <div className="group">
-              <p className="text-xs text-slate-500 uppercase tracking-wider">Contact</p>
+              <p className="text-xs text-slate-500 uppercase tracking-wider">
+                Contact
+              </p>
               <p className="text-sm font-medium text-slate-100 mt-0.5">
                 {order.customer_details.contact_no}
               </p>
             </div>
           </div>
         </div>
-        {/* Waiter Info */}
+
+        {/* Waiter Info - With Action Button */}
         <div className={`${card_class} flex-1`}>
           <div className="flex items-center gap-2 mb-4 pb-2 border-b border-white/10">
             <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-purple-500/20 to-purple-600/20 flex items-center justify-center">
-              <svg className="w-4 h-4 text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+              <svg
+                className="w-4 h-4 text-purple-400"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"
+                />
               </svg>
             </div>
             <span className="text-sm font-semibold text-slate-300">Waiter</span>
           </div>
           <div className="space-y-3">
             <div className="group">
-              <p className="text-xs text-slate-500 uppercase tracking-wider">Name</p>
+              <p className="text-xs text-slate-500 uppercase tracking-wider">
+                Name
+              </p>
               <p className="text-sm font-medium text-slate-100 mt-0.5">
-                {order.waiter_details.waiter_name}
+                {order.waiter_details.waiter_name || "Not Assigned"}
               </p>
             </div>
+            <button
+              type="button"
+              onClick={onAssignWaiter}
+              disabled={isLoadingWaiters}
+              className="w-full mt-3 px-4 py-2 bg-gradient-to-r from-purple-500 to-purple-600 hover:from-purple-600 hover:to-purple-700 disabled:from-purple-400 disabled:to-purple-500 disabled:cursor-not-allowed text-white text-sm font-medium rounded-lg shadow-lg shadow-purple-500/25 transition-all duration-200 flex items-center justify-center gap-2"
+            >
+              {isLoadingWaiters ? (
+                <>
+                  <svg
+                    className="w-4 h-4 animate-spin"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                  >
+                    <circle
+                      className="opacity-25"
+                      cx="12"
+                      cy="12"
+                      r="10"
+                      stroke="currentColor"
+                      strokeWidth="4"
+                    />
+                    <path
+                      className="opacity-75"
+                      fill="currentColor"
+                      d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                    />
+                  </svg>
+                  Loading...
+                </>
+              ) : (
+                <>
+                  <svg
+                    className="w-4 h-4"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4"
+                    />
+                  </svg>
+                  Change Waiter
+                </>
+              )}
+            </button>
           </div>
         </div>
       </div>
+
       {/* Order Details */}
       <div className={`${card_class} mt-4`}>
         <div className="flex items-center gap-2 mb-4 pb-2 border-b border-white/10">
           <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-green-500/20 to-green-600/20 flex items-center justify-center">
-            <svg className="w-4 h-4 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+            <svg
+              className="w-4 h-4 text-green-400"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"
+              />
             </svg>
           </div>
-          <span className="text-sm font-semibold text-slate-300">Order Details</span>
+          <span className="text-sm font-semibold text-slate-300">
+            Order Details
+          </span>
         </div>
         <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
           <div className="group">
-            <p className="text-xs text-slate-500 uppercase tracking-wider">Restaurant</p>
+            <p className="text-xs text-slate-500 uppercase tracking-wider">
+              Restaurant
+            </p>
             <p className="text-sm font-medium text-slate-100 mt-0.5">
               {order.order_obj.restaurant_name}
             </p>
           </div>
           <div className="group">
-            <p className="text-xs text-slate-500 uppercase tracking-wider">Table No</p>
+            <p className="text-xs text-slate-500 uppercase tracking-wider">
+              Table No
+            </p>
             <p className="text-sm font-medium text-slate-100 mt-0.5">
               {order.order_obj.table_no}
             </p>
           </div>
           <div className="group col-span-2 md:col-span-1">
-            <p className="text-xs text-slate-500 uppercase tracking-wider">Total Amount</p>
+            <p className="text-xs text-slate-500 uppercase tracking-wider">
+              Total Amount
+            </p>
             <p className="text-lg font-bold bg-gradient-to-r from-green-400 to-emerald-400 bg-clip-text text-transparent mt-0.5">
               ₹{order.order_obj.total_amount}
             </p>
           </div>
         </div>
       </div>
-      {/* Menu Items */}
+
+      {/* Menu Items - With Remove Option */}
       <div className={`${card_class} mt-4`}>
         <div className="flex items-center gap-2 mb-4 pb-2 border-b border-white/10">
           <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-orange-500/20 to-orange-600/20 flex items-center justify-center">
-            <svg className="w-4 h-4 text-orange-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+            <svg
+              className="w-4 h-4 text-orange-400"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"
+              />
             </svg>
           </div>
-          <span className="text-sm font-semibold text-slate-300">Menu Items</span>
+          <span className="text-sm font-semibold text-slate-300">
+            Menu Items
+          </span>
           <span className="ml-auto text-xs text-slate-500 bg-white/5 px-2 py-1 rounded-full">
             {order.order_obj.menu_items.length} items
           </span>
@@ -178,6 +309,9 @@ function ShowOrderDetails({ order }: { order: GetOrderFullDetailsRes }) {
                 </th>
                 <th className="text-center py-3 px-3 text-xs text-slate-400 uppercase tracking-wider font-medium">
                   Status
+                </th>
+                <th className="text-center py-3 px-3 text-xs text-slate-400 uppercase tracking-wider font-medium">
+                  Action
                 </th>
               </tr>
             </thead>
@@ -215,6 +349,28 @@ function ShowOrderDetails({ order }: { order: GetOrderFullDetailsRes }) {
                       {item.status}
                     </span>
                   </td>
+                  <td className="py-3 px-3 text-center">
+                    <button
+                      type="button"
+                      onClick={() => onRemoveItem(item.pid)}
+                      className="p-1.5 text-red-400 hover:text-red-300 hover:bg-red-500/10 rounded-lg transition-all duration-150"
+                      title="Remove item"
+                    >
+                      <svg
+                        className="w-4 h-4"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2}
+                          d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
+                        />
+                      </svg>
+                    </button>
+                  </td>
                 </tr>
               ))}
             </tbody>
@@ -225,4 +381,4 @@ function ShowOrderDetails({ order }: { order: GetOrderFullDetailsRes }) {
   );
 }
 
-export default ShowOrderDetails;
+export default EditOrderDetails;

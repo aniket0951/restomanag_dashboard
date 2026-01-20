@@ -1,44 +1,35 @@
 import { useEffect, useState } from "react";
-import { useForm } from "react-hook-form";
-import { useLocation, useNavigate } from "react-router-dom";
-import { form_class } from "../../../utils/csstags";
-import { LocalStorageKey } from "../../../utils/constants";
-import { getApi, postApi } from "../../../utils/api";
-import type { CreateRestaurantTableRes } from "../../../types/restaurant";
+import { useLocation } from "react-router-dom";
+import { getApi } from "../../../utils/api";
 import { EndPoint } from "../../../utils/endpoints";
-import toast from "react-hot-toast/headless";
 import { OrderTags, QueryParams } from "./queryparams";
-import type { GetOrderFullDetailsRes } from "../../../types/orders";
+import { EmplRoles } from "../../../utils/constants";
+import { restaurantStore } from "../../../store/user_store";
+import type { GetOrderFullDetailsRes, MenuItems } from "../../../types/orders";
+import type { ListEmplsByRoleAndRestoRes } from "../../../types/empls";
 import ShowOrderDetails from "./show_order_details";
-
-type CreateRestaurantTableForm = {
-  number: string;
-  status: string;
-  pid: string;
-  restaurant_pid: string;
-  capacity: number;
-};
+import EditOrderDetails from "./edit_order_details";
+import WaiterSelectionModal from "./waiter_selection_modal";
+import ConfirmModal from "./confirm_modal";
 
 function DisplayAndUpdateOrder() {
-  const navigate = useNavigate();
   const [orderFullDetails, setOrderFullDetails] =
     useState<GetOrderFullDetailsRes>();
+  const [waiters, setWaiters] = useState<ListEmplsByRoleAndRestoRes[]>([]);
+  const [isWaiterModalOpen, setIsWaiterModalOpen] = useState(false);
+  const [isLoadingWaiters, setIsLoadingWaiters] = useState(false);
+  const [isConfirmModalOpen, setIsConfirmModalOpen] = useState(false);
+  const [itemToRemove, setItemToRemove] = useState<MenuItems | null>(null);
   const { state } = useLocation();
   const orderPID = state?.orderPID;
   const tag = state?.tag as string | undefined;
-
-  const {
-    register,
-    handleSubmit,
-    setValue,
-    formState: { errors, isSubmitting },
-  } = useForm<CreateRestaurantTableForm>({});
+  const restaurantstore = restaurantStore((state) => state.restaurant);
 
   useEffect(() => {
-    if (tag === OrderTags.Display) {
+    if (tag === OrderTags.Display || tag === OrderTags.Edit) {
       fetchOrderFullDetails(orderPID);
     }
-  }, []);
+  }, [orderPID, tag]);
 
   const fetchOrderFullDetails = async (orderPID: string) => {
     const res = await getApi<GetOrderFullDetailsRes>(
@@ -53,62 +44,122 @@ function DisplayAndUpdateOrder() {
     }
   };
 
-  // useEffect(() => {
-  //   if (stateCurrentTable != null && stateCurrentTable != undefined) {
-  //     setValue("number", stateCurrentTable.number);
-  //     setValue("status", stateCurrentTable.status);
-  //     setValue("pid", stateCurrentTable.pid);
-  //     setItemMenuForUpdate(true);
-  //   }
-  // }, [setItemMenuForUpdate, setValue, stateCurrentTable]);
+  const fetchWaiters = async () => {
+    setIsLoadingWaiters(true);
+    const res = await getApi<ListEmplsByRoleAndRestoRes[]>(
+      EndPoint.ListEmplByRoleAndResto,
+      {
+        [QueryParams.Role]: EmplRoles.Waiter,
+        [QueryParams.RestaurantPID]: restaurantstore?.id,
+      },
+    );
 
-  const onUpdate = async (data: CreateRestaurantTableForm) => {
-    try {
-      const restaurantPID = localStorage.getItem(
-        LocalStorageKey.CurrentRestaurant,
-      );
-      data.restaurant_pid = restaurantPID ?? "";
+    if (res.status_code === 200 && res.data) {
+      setWaiters(res.data);
+    }
+    setIsLoadingWaiters(false);
+  };
 
-      const res = await postApi(EndPoint.UpdateRestaurantTable, data);
+  const handleAssignWaiter = async () => {
+    await fetchWaiters();
+    setIsWaiterModalOpen(true);
+  };
 
-      if (res.status_code == 200) {
-        toast.success(res.message);
-        navigate("/dashboard/table");
-      } else {
-        toast.error(res.message);
-      }
-    } catch {
-      console.log();
+  const handleWaiterSelect = (waiter: ListEmplsByRoleAndRestoRes) => {
+    // Update the order with selected waiter
+    if (orderFullDetails) {
+      setOrderFullDetails({
+        ...orderFullDetails,
+        waiter_details: {
+          waiter_pid: waiter.pid,
+          waiter_name: waiter.name,
+        },
+      });
+    }
+    setIsWaiterModalOpen(false);
+    // TODO: Call API to update waiter assignment
+    console.log("Selected waiter:", waiter);
+  };
+
+  const handleRemoveItem = (itemPid: string) => {
+    if (!orderFullDetails) return;
+
+    // Find the item to remove for confirmation message
+    const item = orderFullDetails.order_obj.menu_items.find(
+      (item) => item.pid === itemPid
+    );
+
+    if (item) {
+      setItemToRemove(item);
+      setIsConfirmModalOpen(true);
     }
   };
 
-  const onSubmit = async (data: CreateRestaurantTableForm) => {
-    try {
-      const restaurantPID = localStorage.getItem(
-        LocalStorageKey.CurrentRestaurant,
-      );
-      data.restaurant_pid = restaurantPID ?? "";
-      console.log("Data : ", data);
-      const res = await postApi<CreateRestaurantTableRes>(
-        EndPoint.CreateRestaurantTable,
-        data,
-      );
+  const confirmRemoveItem = () => {
+    if (!orderFullDetails || !itemToRemove) return;
 
-      if (res.status_code == 200) {
-        toast.success(res.message);
-        navigate("/dashboard/table");
-      } else {
-        toast.error(res.message);
-      }
-    } catch {
-      console.log();
-    }
+    // Filter out the removed item
+    const updatedMenuItems = orderFullDetails.order_obj.menu_items.filter(
+      (item) => item.pid !== itemToRemove.pid
+    );
+
+    // Recalculate total amount
+    const newTotalAmount = updatedMenuItems.reduce(
+      (total, item) => total + item.price * item.quantity,
+      0
+    );
+
+    // Update state
+    setOrderFullDetails({
+      ...orderFullDetails,
+      order_obj: {
+        ...orderFullDetails.order_obj,
+        menu_items: updatedMenuItems,
+        total_amount: newTotalAmount,
+      },
+    });
+
+    // TODO: Call API to remove item from order
+    console.log("Removed item:", itemToRemove.pid);
+
+    // Close modal and reset
+    setIsConfirmModalOpen(false);
+    setItemToRemove(null);
+  };
+
+  const cancelRemoveItem = () => {
+    setIsConfirmModalOpen(false);
+    setItemToRemove(null);
   };
 
   return (
     <>
       {tag === OrderTags.Display && orderFullDetails ? (
         <ShowOrderDetails order={orderFullDetails} />
+      ) : tag === OrderTags.Edit && orderFullDetails ? (
+        <>
+          <EditOrderDetails
+            order={orderFullDetails}
+            onAssignWaiter={handleAssignWaiter}
+            onRemoveItem={handleRemoveItem}
+            isLoadingWaiters={isLoadingWaiters}
+          />
+          <WaiterSelectionModal
+            isOpen={isWaiterModalOpen}
+            waiters={waiters}
+            onClose={() => setIsWaiterModalOpen(false)}
+            onSelect={handleWaiterSelect}
+          />
+          <ConfirmModal
+            isOpen={isConfirmModalOpen}
+            title="Remove Item"
+            message={`Are you sure you want to remove "${itemToRemove?.menu_name}" from this order?`}
+            confirmText="Remove"
+            cancelText="Cancel"
+            onConfirm={confirmRemoveItem}
+            onCancel={cancelRemoveItem}
+          />
+        </>
       ) : (
         <></>
       )}
