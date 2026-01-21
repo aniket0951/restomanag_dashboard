@@ -108,22 +108,59 @@ export function OrderStats({
   value: number;
   changes: number;
 }) {
+  const isPositive = changes >= 0;
   return (
-    <div className={children_parent_div}>
-      <div className="flex items-start justify-between">
+    <div className="relative overflow-hidden bg-gradient-to-br from-blue-500/10 to-indigo-500/10 dark:from-slate-800/80 dark:to-slate-900/80 backdrop-blur-xl rounded-2xl p-5 border border-blue-500/20 dark:border-white/10 hover:shadow-xl hover:scale-[1.02] transition-all duration-300 group">
+      {/* Background decoration */}
+      <div className="absolute -top-10 -right-10 w-32 h-32 bg-gradient-to-br from-blue-500 to-indigo-500 opacity-10 rounded-full blur-2xl group-hover:opacity-20 transition-opacity duration-300" />
+
+      <div className="relative flex items-start justify-between">
         <div className="flex-1">
-          <p className={children_title}>Total Orders</p>
-          <p className="text-2xl font-bold text-slate-800 dark:text-white mb-4">
-            $ {value}
+          <div className="flex items-center gap-2 mb-3">
+            <div className="w-8 h-8 rounded-lg bg-blue-500/20 flex items-center justify-center">
+              <BarChart3 className="w-4 h-4 text-blue-400" />
+            </div>
+            <p className="text-sm font-medium text-slate-600 dark:text-slate-400">
+              Total Orders
+            </p>
+          </div>
+
+          <p className="text-3xl font-bold text-slate-800 dark:text-white mb-3">
+            {value.toLocaleString()}
           </p>
-          <div className="flex items-center space-x-2">
-            <ArrowUpRight className="w-4 h-4 text-emerald-600" />
-            <span className={childern_span_percentage}>{changes} %</span>
-            <span className="text-sm text-slate-500 dark:text-slate-400">
+
+          <div className="flex items-center gap-2">
+            <div
+              className={`flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium ${
+                isPositive
+                  ? "bg-emerald-500/10 text-emerald-500"
+                  : "bg-red-500/10 text-red-500"
+              }`}
+            >
+              {isPositive ? (
+                <TrendingUp className="w-3 h-3" />
+              ) : (
+                <TrendingDown className="w-3 h-3" />
+              )}
+              {Math.abs(changes)}%
+            </div>
+            <span className="text-xs text-slate-500 dark:text-slate-500">
               vs Last Month
             </span>
           </div>
         </div>
+
+        <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center shadow-lg group-hover:scale-110 group-hover:rotate-3 transition-all duration-300">
+          <BarChart3 className="w-6 h-6 text-white" />
+        </div>
+      </div>
+
+      {/* Progress bar */}
+      <div className="mt-4 h-1.5 bg-slate-200/50 dark:bg-slate-700/50 rounded-full overflow-hidden">
+        <div
+          className="h-full bg-gradient-to-r from-blue-500 to-indigo-500 rounded-full transition-all duration-500"
+          style={{ width: `${Math.min(changes, 100)}%` }}
+        />
       </div>
     </div>
   );
@@ -131,34 +168,47 @@ export function OrderStats({
 
 export function Revenue({ value }: { value: number }) {
   return (
-    <div className={children_parent_div}>
-      <div className="flex items-start justify-between">
+    <div className="relative overflow-hidden bg-gradient-to-br from-emerald-500/10 to-teal-500/10 dark:from-slate-800/80 dark:to-slate-900/80 backdrop-blur-xl rounded-2xl p-5 border border-emerald-500/20 dark:border-white/10 hover:shadow-xl hover:scale-[1.02] transition-all duration-300 group">
+      {/* Background decoration */}
+      <div className="absolute -top-10 -right-10 w-32 h-32 bg-gradient-to-br from-emerald-500 to-teal-500 opacity-10 rounded-full blur-2xl group-hover:opacity-20 transition-opacity duration-300" />
+
+      <div className="relative flex items-start justify-between">
         <div className="flex-1">
-          <p className={children_title}>Revenue</p>
-          <p className="text-2xl font-bold text-slate-800 dark:text-white mb-4">
-            $ {value}
+          <div className="flex items-center gap-2 mb-3">
+            <div className="w-8 h-8 rounded-lg bg-emerald-500/20 flex items-center justify-center">
+              <Wallet2 className="w-4 h-4 text-emerald-400" />
+            </div>
+            <p className="text-sm font-medium text-slate-600 dark:text-slate-400">
+              Revenue
+            </p>
+          </div>
+
+          <p className="text-3xl font-bold text-slate-800 dark:text-white mb-3">
+            ₹{value.toLocaleString()}
           </p>
-          <div className="flex items-center space-x-2">
-            <ArrowDownLeft className="w-4 h-4 text-red-600" />
-            <span className={childern_span_percentage}>25%</span>
-            <span className="text-sm text-slate-500 dark:text-slate-400">
+
+          <div className="flex items-center gap-2">
+            <div className="flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium bg-emerald-500/10 text-emerald-500">
+              <TrendingUp className="w-3 h-3" />
+              25%
+            </div>
+            <span className="text-xs text-slate-500 dark:text-slate-500">
               vs Last Month
             </span>
           </div>
         </div>
-        <div
-          className={`p-3 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800 group:hover:scale-110 transition-all duration-300`}
-        >
-          <DollarSign className={children_doller_sign} />
+
+        <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-emerald-500 to-teal-600 flex items-center justify-center shadow-lg group-hover:scale-110 group-hover:rotate-3 transition-all duration-300">
+          <DollarSign className="w-6 h-6 text-white" />
         </div>
       </div>
 
-      <div className="mt-4 h-2 bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden">
+      {/* Progress bar */}
+      <div className="mt-4 h-1.5 bg-slate-200/50 dark:bg-slate-700/50 rounded-full overflow-hidden">
         <div
-          className={`h-full bg-gradient-to-r from-emerald-500 to-teal-600
-            rounded-full transition-all duration-100`}
+          className="h-full bg-gradient-to-r from-emerald-500 to-teal-500 rounded-full transition-all duration-500"
           style={{ width: "75%" }}
-        ></div>
+        />
       </div>
     </div>
   );
