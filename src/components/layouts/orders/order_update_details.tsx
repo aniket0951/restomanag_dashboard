@@ -1,11 +1,12 @@
 import { useEffect, useState } from "react";
 import { useLocation } from "react-router-dom";
-import { getApi } from "../../../utils/api";
+import { getApi, postApi } from "../../../utils/api";
 import { EndPoint } from "../../../utils/endpoints";
+import toast from "react-hot-toast";
 import { OrderTags, QueryParams } from "./queryparams";
 import { EmplRoles } from "../../../utils/constants";
 import { restaurantStore } from "../../../store/user_store";
-import type { GetOrderFullDetailsRes, MenuItems } from "../../../types/orders";
+import type { GetOrderFullDetailsRes, MenuItems, AssignWaiterToOrderReq } from "../../../types/orders";
 import type { ListEmplsByRoleAndRestoRes } from "../../../types/empls";
 import ShowOrderDetails from "./show_order_details";
 import EditOrderDetails from "./edit_order_details";
@@ -65,9 +66,18 @@ function DisplayAndUpdateOrder() {
     setIsWaiterModalOpen(true);
   };
 
-  const handleWaiterSelect = (waiter: ListEmplsByRoleAndRestoRes) => {
-    // Update the order with selected waiter
-    if (orderFullDetails) {
+  const handleWaiterSelect = async (waiter: ListEmplsByRoleAndRestoRes) => {
+    if (!orderFullDetails || !restaurantstore?.id) return;
+
+    const req: AssignWaiterToOrderReq = {
+      order_pid: orderFullDetails.order_obj.pid,
+      waiter_pid: waiter.pid,
+      restaurant_pid: restaurantstore.id,
+    };
+
+    const res = await postApi(EndPoint.AssignOrderToWaiter, req);
+
+    if (res.status_code === 200) {
       setOrderFullDetails({
         ...orderFullDetails,
         waiter_details: {
@@ -75,10 +85,10 @@ function DisplayAndUpdateOrder() {
           waiter_name: waiter.name,
         },
       });
+      toast.success(`Waiter changed to ${waiter.name}`);
     }
+
     setIsWaiterModalOpen(false);
-    // TODO: Call API to update waiter assignment
-    console.log("Selected waiter:", waiter);
   };
 
   const handleRemoveItem = (itemPid: string) => {

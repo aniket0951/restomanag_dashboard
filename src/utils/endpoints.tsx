@@ -50,4 +50,5 @@ export const EndPoint = {
   ListOrdersByRestaurantAndStatus: `${Orders}/list/restaurant`,
   CountActiveOrdersByRestaurantAndStatus: `${Orders}/active/count`,
   GetOrdersFullDetails: `${Orders}/details`,
+  AssignOrderToWaiter: `${Orders}/assign`,
 };

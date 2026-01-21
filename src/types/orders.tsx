@@ -8,6 +8,9 @@ export interface ListOrdersByRestaurantAndStatusRes {
   total_amount: number;
   status: string;
   created_at: number;
+  waiter_name: string;
+  waiter_pid: string;
+  is_waiter_assign: boolean;
 }
 
 export interface CountActiveOrdersByRestaurantAnsStatusRes {
@@ -55,4 +58,10 @@ export interface CustomerDetails {
 export interface WaiterDetails {
   waiter_name: string;
   waiter_pid: string;
+}
+
+export interface AssignWaiterToOrderReq {
+  order_pid: string;
+  waiter_pid: string;
+  restaurant_pid: string;
 }

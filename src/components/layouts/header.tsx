@@ -2,11 +2,9 @@ import {
   Bell,
   ChevronDown,
   Menu,
-  Moon,
   Plus,
   Search,
   Settings,
-  Sun,
   User,
   LogOut,
   Store,
@@ -26,7 +24,6 @@ function Header({ onToggleSidebar }: HeaderProps) {
   const restaurantstore = restaurantStore((state) => state.restaurant);
   const [open, setOpen] = useState(false);
   const [coords, setCoords] = useState({ top: 0, left: 0 });
-  const [isDark, setIsDark] = useState(true);
   const location = useLocation();
 
   const btnRef = useRef<HTMLDivElement | null>(null);
@@ -161,14 +158,6 @@ function Header({ onToggleSidebar }: HeaderProps) {
 
             {/* Icon Buttons */}
             <div className="flex items-center gap-1">
-              {/* Theme Toggle */}
-              <button
-                onClick={() => setIsDark(!isDark)}
-                className="p-2.5 rounded-xl text-slate-400 hover:text-white hover:bg-white/5 transition-all duration-200"
-              >
-                {isDark ? <Moon className="w-5 h-5" /> : <Sun className="w-5 h-5" />}
-              </button>
-
               {/* Notifications */}
               <button className="relative p-2.5 rounded-xl text-slate-400 hover:text-white hover:bg-white/5 transition-all duration-200 group">
                 <Bell className="w-5 h-5" />

@@ -17,15 +17,18 @@ import {
 import type {
   CountActiveOrdersByRestaurantAnsStatusRes,
   ListOrdersByRestaurantAndStatusRes,
+  AssignWaiterToOrderReq,
 } from "../../../types/orders";
 import { formatOrderId, unixToString } from "../../../utils/utils";
 import { restaurantStore } from "../../../store/user_store";
-import { getApi } from "../../../utils/api";
+import { getApi, postApi } from "../../../utils/api";
 import { EndPoint } from "../../../utils/endpoints";
 import { OrderTags, QueryParams } from "./queryparams";
 import type { ListEmplsByRoleAndRestoRes } from "../../../types/empls";
 import { EmplRoles } from "../../../utils/constants";
 import { useNavigate } from "react-router-dom";
+import WaiterSelectionModal from "./waiter_selection_modal";
+import toast from "react-hot-toast";
 
 const FormattedDate = () => {
   const date = new Date();
@@ -110,6 +113,8 @@ function Orders() {
   const [activeStatusCounts, setActiveStatusCounts] = useState<
     CountActiveOrdersByRestaurantAnsStatusRes[]
   >([]);
+  const [isWaiterModalOpen, setIsWaiterModalOpen] = useState(false);
+  const [selectedOrderPid, setSelectedOrderPid] = useState<string | null>(null);
 
   const fecthNextCategory = () => setPage((p) => p + 1);
   const fecthPreviousCategory = () => {
@@ -213,6 +218,31 @@ function Orders() {
         tag: tag,
       },
     });
+  };
+
+  const handleAssignClick = (orderPid: string) => {
+    setSelectedOrderPid(orderPid);
+    setIsWaiterModalOpen(true);
+  };
+
+  const handleWaiterSelect = async (waiter: ListEmplsByRoleAndRestoRes) => {
+    if (!selectedOrderPid || !restaurantstore?.id) return;
+
+    const req: AssignWaiterToOrderReq = {
+      order_pid: selectedOrderPid,
+      waiter_pid: waiter.pid,
+      restaurant_pid: restaurantstore.id,
+    };
+
+    const res = await postApi(EndPoint.AssignOrderToWaiter, req);
+
+    if (res.status_code === 200) {
+      toast.success(`Order assigned to ${waiter.name}`);
+      fetchOrdersByStatus(activeTab);
+    }
+
+    setIsWaiterModalOpen(false);
+    setSelectedOrderPid(null);
   };
 
   return (
@@ -403,10 +433,22 @@ function Orders() {
                       </td>
                       {activeTab === "pending" && (
                         <td className="py-4 px-4 text-center">
-                          <button className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-gradient-to-r from-purple-500 to-purple-600 hover:from-purple-600 hover:to-purple-700 text-white text-xs font-medium shadow-lg shadow-purple-500/25 transition-all duration-200">
-                            <UserPlus className="w-3.5 h-3.5" />
-                            Assign
-                          </button>
+                          {item.is_waiter_assign ? (
+                            <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-emerald-500/10 text-emerald-400 text-xs font-medium border border-emerald-500/30">
+                              {item.waiter_name}
+                            </span>
+                          ) : (
+                            <button
+                              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-gradient-to-r from-purple-500 to-purple-600 hover:from-purple-600 hover:to-purple-700 text-white text-xs font-medium shadow-lg shadow-purple-500/25 transition-all duration-200"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                handleAssignClick(item.pid);
+                              }}
+                            >
+                              <UserPlus className="w-3.5 h-3.5" />
+                              Assign
+                            </button>
+                          )}
                         </td>
                       )}
                     </tr>
@@ -455,6 +497,16 @@ function Orders() {
           </div>
         </div>
       </div>
+
+      <WaiterSelectionModal
+        isOpen={isWaiterModalOpen}
+        waiters={emplLits}
+        onClose={() => {
+          setIsWaiterModalOpen(false);
+          setSelectedOrderPid(null);
+        }}
+        onSelect={handleWaiterSelect}
+      />
     </div>
   );
 }
