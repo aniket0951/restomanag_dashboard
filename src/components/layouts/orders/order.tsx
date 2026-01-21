@@ -13,6 +13,7 @@ import {
   Coffee,
   Hash,
   UserPlus,
+  RefreshCw,
 } from "lucide-react";
 import type {
   CountActiveOrdersByRestaurantAnsStatusRes,
@@ -26,7 +27,7 @@ import { EndPoint } from "../../../utils/endpoints";
 import { OrderTags, QueryParams } from "./queryparams";
 import type { ListEmplsByRoleAndRestoRes } from "../../../types/empls";
 import { EmplRoles } from "../../../utils/constants";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import WaiterSelectionModal from "./waiter_selection_modal";
 import toast from "react-hot-toast";
 
@@ -102,19 +103,29 @@ const tabIcons: Record<string, React.ReactNode> = {
 };
 
 function Orders() {
+  const navigate = useNavigate();
+  const [searchParams, setSearchParams] = useSearchParams();
   const [orders, setOrders] = useState<ListOrdersByRestaurantAndStatusRes[]>(
     [],
   );
-  const navigate = useNavigate();
   const [emplLits, setEmplList] = useState<ListEmplsByRoleAndRestoRes[]>([]);
   const [page, setPage] = useState(1);
-  const [activeTab, setActiveTab] = useState("pending");
+  const [activeTab, setActiveTab] = useState(
+    searchParams.get("tab") || "pending",
+  );
   const restaurantstore = restaurantStore((state) => state.restaurant);
+
+  const updateActiveTab = (tab: string) => {
+    setActiveTab(tab);
+    setSearchParams({ tab });
+  };
   const [activeStatusCounts, setActiveStatusCounts] = useState<
     CountActiveOrdersByRestaurantAnsStatusRes[]
   >([]);
   const [isWaiterModalOpen, setIsWaiterModalOpen] = useState(false);
   const [selectedOrderPid, setSelectedOrderPid] = useState<string | null>(null);
+  const [isRefreshing, setIsRefreshing] = useState(false);
+  const [lastRefreshed, setLastRefreshed] = useState<Date | null>(null);
 
   const fecthNextCategory = () => setPage((p) => p + 1);
   const fecthPreviousCategory = () => {
@@ -155,10 +166,6 @@ function Orders() {
     if (activeStatusCounts.length <= 0) {
       fetchCountActiveOrdersByRestAndStatus();
     }
-
-    if (emplLits.length <= 0) {
-      fetchListEmplsByRoleAndResto();
-    }
   }, []);
 
   useEffect(() => {
@@ -179,6 +186,7 @@ function Orders() {
 
     if (res.status_code == 200 && res.data) {
       setOrders(res.data);
+      setLastRefreshed(new Date());
     } else {
       setOrders([]);
     }
@@ -220,7 +228,16 @@ function Orders() {
     });
   };
 
+  const handleRefresh = async () => {
+    setIsRefreshing(true);
+    await fetchOrdersByStatus(activeTab);
+    setIsRefreshing(false);
+  };
+
   const handleAssignClick = (orderPid: string) => {
+    if (emplLits.length <= 0) {
+      fetchListEmplsByRoleAndResto();
+    }
     setSelectedOrderPid(orderPid);
     setIsWaiterModalOpen(true);
   };
@@ -267,7 +284,7 @@ function Orders() {
             <button
               key={tab.key}
               className={`flex items-center gap-2 px-4 py-2.5 text-sm font-medium rounded-xl border transition-all duration-300 whitespace-nowrap ${getTabClasses(tab.key, tab.color)}`}
-              onClick={() => setActiveTab(tab.key)}
+              onClick={() => updateActiveTab(tab.key)}
             >
               {tabIcons[tab.key]}
               <span>{tab.label}</span>
@@ -304,9 +321,30 @@ function Orders() {
               </div>
             </div>
 
-            {/* Date Filter */}
-            <div className="flex items-center gap-4">
+            {/* Date Filter & Refresh */}
+            <div className="flex items-center gap-2">
               {FormattedDate()}
+              <div className="flex flex-col items-center">
+                <button
+                  onClick={handleRefresh}
+                  disabled={isRefreshing}
+                  className="p-2.5 rounded-xl bg-white/5 border border-white/10 text-slate-400 hover:text-white hover:bg-white/10 disabled:opacity-50 transition-all duration-200"
+                  title="Refresh orders"
+                >
+                  <RefreshCw
+                    className={`w-4 h-4 ${isRefreshing ? "animate-spin" : ""}`}
+                  />
+                </button>
+                {lastRefreshed && (
+                  <span className="text-[10px] text-slate-500 mt-1">
+                    Last refresh at{" "}
+                    {lastRefreshed.toLocaleTimeString([], {
+                      hour: "2-digit",
+                      minute: "2-digit",
+                    })}
+                  </span>
+                )}
+              </div>
             </div>
           </div>
         </div>
@@ -351,8 +389,11 @@ function Orders() {
                   const StatusIcon = statusConfig.icon;
                   return (
                     <tr
-                      className={`border-b border-white/5 hover:bg-white/5 transition-all duration-200 ${index % 2 === 0 ? "bg-white/[0.02]" : ""}`}
+                      className={`border-b border-white/5 hover:bg-white/5 transition-all duration-200 cursor-pointer ${index % 2 === 0 ? "bg-white/[0.02]" : ""}`}
                       key={item.pid}
+                      onClick={() =>
+                        editAndDisplayOrder(OrderTags.Display, item.pid)
+                      }
                     >
                       <td className="py-4 px-4">
                         <span className="text-slate-500 text-sm">
@@ -371,7 +412,7 @@ function Orders() {
                       </td>
                       <td className="py-4 px-4 text-center">
                         <span className="inline-flex items-center justify-center w-8 h-8 rounded-lg bg-white/10 text-slate-200 text-sm font-medium">
-                          {item?.table_no || "NA"}
+                          {item?.table_no?.replace(/Table\s*/i, "") || "NA"}
                         </span>
                       </td>
                       <td className="py-4 px-4 text-right">
@@ -399,7 +440,10 @@ function Orders() {
                               className="p-2 rounded-lg bg-blue-500/10 text-blue-400 hover:bg-blue-500/20 transition-all duration-200"
                               onClick={(e) => {
                                 e.stopPropagation();
-                                editAndDisplayOrder(OrderTags.Display, item.pid);
+                                editAndDisplayOrder(
+                                  OrderTags.Display,
+                                  item.pid,
+                                );
                               }}
                               title="View Details"
                             >
@@ -421,7 +465,10 @@ function Orders() {
                                 className="p-2 rounded-lg bg-blue-500/10 text-blue-400 hover:bg-blue-500/20 transition-all duration-200"
                                 onClick={(e) => {
                                   e.stopPropagation();
-                                  editAndDisplayOrder(OrderTags.Display, item.pid);
+                                  editAndDisplayOrder(
+                                    OrderTags.Display,
+                                    item.pid,
+                                  );
                                 }}
                                 title="View Details"
                               >
