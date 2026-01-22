@@ -278,8 +278,19 @@ function SideBar({
       <div className="p-3 border-t border-white/5">
         {/* Settings Button */}
         {!collapsed && (
-          <button className="w-full flex items-center gap-3 p-3 mb-2 text-slate-400 hover:text-white hover:bg-white/5 rounded-xl transition-all duration-200">
-            <div className="w-9 h-9 rounded-lg bg-white/5 flex items-center justify-center">
+          <button
+            onClick={() => navigate("/dashboard/settings")}
+            className={`w-full flex items-center gap-3 p-3 mb-2 rounded-xl transition-all duration-200 ${
+              location.pathname === "/dashboard/settings"
+                ? "bg-gradient-to-r from-blue-600/20 to-purple-600/20 text-white border border-blue-500/20"
+                : "text-slate-400 hover:text-white hover:bg-white/5"
+            }`}
+          >
+            <div className={`w-9 h-9 rounded-lg flex items-center justify-center ${
+              location.pathname === "/dashboard/settings"
+                ? "bg-gradient-to-br from-blue-500 to-purple-600 shadow-lg shadow-blue-500/25"
+                : "bg-white/5"
+            }`}>
               <Settings className="w-[18px] h-[18px]" />
             </div>
             <span className="font-medium text-sm">Settings</span>

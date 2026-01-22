@@ -42,6 +42,7 @@ function Header({ onToggleSidebar }: HeaderProps) {
     if (path.includes("/menu")) return "Menu";
     if (path.includes("/table")) return "Tables";
     if (path.includes("/restaurants")) return "Restaurants";
+    if (path.includes("/settings")) return "Settings";
     return "Dashboard";
   };
 
@@ -167,7 +168,10 @@ function Header({ onToggleSidebar }: HeaderProps) {
               </button>
 
               {/* Settings */}
-              <button className="p-2.5 rounded-xl text-slate-400 hover:text-white hover:bg-white/5 transition-all duration-200">
+              <button
+                onClick={() => navigate("/dashboard/settings")}
+                className="p-2.5 rounded-xl text-slate-400 hover:text-white hover:bg-white/5 transition-all duration-200"
+              >
                 <Settings className="w-5 h-5" />
               </button>
             </div>
@@ -239,7 +243,13 @@ function Header({ onToggleSidebar }: HeaderProps) {
                 <Store className="w-4 h-4" />
                 <span>My Restaurants</span>
               </button>
-              <button className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-slate-400 hover:text-white hover:bg-white/5 transition-all duration-200">
+              <button
+                onClick={() => {
+                  navigate("/dashboard/settings");
+                  setOpen(false);
+                }}
+                className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-slate-400 hover:text-white hover:bg-white/5 transition-all duration-200"
+              >
                 <Settings className="w-4 h-4" />
                 <span>Settings</span>
               </button>
