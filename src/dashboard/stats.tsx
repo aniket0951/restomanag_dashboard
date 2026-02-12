@@ -1,6 +1,5 @@
 import {
   ArrowDownLeft,
-  ArrowUpRight,
   BadgeCheck,
   BarChart3,
   DollarSign,

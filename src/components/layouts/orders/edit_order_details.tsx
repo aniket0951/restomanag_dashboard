@@ -1,7 +1,15 @@
 import { useNavigate } from "react-router-dom";
-import type { GetOrderFullDetailsRes } from "../../../types/orders";
+import type {
+  GetOrderFullDetailsRes,
+  UpdateOrderStatusReq,
+  UpdateOrderStatusRes,
+} from "../../../types/orders";
 import { form_class } from "../../../utils/csstags";
 import { formatOrderId, unixToString } from "../../../utils/utils";
+import toast from "react-hot-toast";
+import { postApi } from "../../../utils/api";
+import { EndPoint } from "../../../utils/endpoints";
+import { OrderStatus } from "../../../utils/constants";
 
 const card_class: string =
   "w-full border border-white/10 rounded-xl p-4 shadow-lg bg-gradient-to-br from-white/10 to-white/5 backdrop-blur-md dark:from-slate-800/60 dark:to-slate-800/40 hover:shadow-xl hover:border-white/20 transition-all duration-300";
@@ -35,6 +43,27 @@ function EditOrderDetails({
         return "bg-purple-100 text-purple-800 shadow-purple-200/50 shadow-sm";
       default:
         return "bg-gray-100 text-gray-800 shadow-sm";
+    }
+  };
+
+  const handleMarkAsComplete = async (order: GetOrderFullDetailsRes) => {
+    try {
+      const req: UpdateOrderStatusReq = {
+        pid: order.order_obj.pid,
+        status: OrderStatus.Completed,
+      };
+      const res = await postApi<UpdateOrderStatusRes>(
+        EndPoint.UpdateOrder,
+        req,
+      );
+      if (res.status_code == 200) {
+        toast.success(res.message);
+        navigate(-1);
+      } else {
+        toast.error(res.message);
+      }
+    } catch {
+      toast.error("Faild to mark order as completed");
     }
   };
 
@@ -79,6 +108,15 @@ function EditOrderDetails({
           <span className="text-xs text-slate-400 bg-white/10 px-2 py-1 rounded-full">
             Edit Mode
           </span>
+          {order.order_obj.status ? (
+            order.order_obj.status == "served" ? (
+              <button onClick={() => handleMarkAsComplete(order)}>
+                <span className="px-4 py-1.5 rounded-full text-xs text-black font-semibold bg-green-400 cursor-pointer">
+                  Mark As Completed
+                </span>
+              </button>
+            ) : null
+          ) : null}
           <span
             className={`px-4 py-1.5 rounded-full text-sm font-semibold ${getStatusColor(order.order_obj.status)} capitalize`}
           >

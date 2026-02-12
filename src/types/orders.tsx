@@ -65,3 +65,16 @@ export interface AssignWaiterToOrderReq {
   waiter_pid: string;
   restaurant_pid: string;
 }
+
+export interface UpdateOrderStatusReq {
+  pid: string;
+  status: string;
+}
+
+export interface UpdateOrderStatusRes {
+  pid: string;
+  user_pid: string;
+  restaurant_pid: string;
+  status: string;
+  created_at: number;
+}
