@@ -21,6 +21,8 @@ import Attendance from "./components/layouts/empls/attendance";
 import CreateUpdateAttendance from "./components/layouts/empls/create_update_attendance";
 import CreateUpdareRestaurant from "./components/layouts/restaurants/create_update_restaurant";
 import GeoLocationComponent from "./components/layouts/restaurants/geolocation";
+import DisplayAndUpdateOrder from "./components/layouts/orders/order_update_details";
+import Settings from "./components/layouts/settings/settings";
 
 export function ProtectedRoute({ children }: { children: React.ReactNode }) {
   const token = localStorage.getItem("authToken");
@@ -84,6 +86,10 @@ function App() {
 
           {/* Orders */}
           <Route path="order" element={<Orders />} />
+          <Route path="order/update" element={<DisplayAndUpdateOrder />} />
+
+          {/* Settings */}
+          <Route path="settings" element={<Settings />} />
         </Route>
       </Routes>
       <Toaster position="top-right" />

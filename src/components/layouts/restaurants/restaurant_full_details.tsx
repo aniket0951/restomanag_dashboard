@@ -1,27 +1,25 @@
 import { useEffect, useRef, useState } from "react";
-import { useNavigate, useParams } from "react-router-dom";
-import { rounded_button } from "../../../utils/csstags";
+import { useParams } from "react-router-dom";
 import { getApi } from "../../../utils/api";
 import type { GetRestaurantRes } from "../../../types/restaurant";
 import { EndPoint } from "../../../utils/endpoints";
 import Categories from "./categories";
 import Menus from "./menus";
 import Tables from "./tables";
-import { Plus } from "lucide-react";
-const owner_details_h3: string =
-  "text-gray-400 dark:text-gray-400 font-medium font-sans";
-
-const parent_div: string =
-  "bg-white/80 dark:bg-slate-800 rounded-xl backdrop-blur-xl overflow-hidden w-full p-2 m-3 border border-slate-200/50 dark:border-slate-700/50";
-
-const div_h2: string = "dark:text-white font-black";
+import {
+  Store,
+  MapPin,
+  UtensilsCrossed,
+  Leaf,
+  Phone,
+  Clock,
+} from "lucide-react";
 
 function RestaurantFullDetails() {
   const { id } = useParams();
   const [restaurantDetails, setRestaurantDetails] =
     useState<GetRestaurantRes | null>(null);
   const calledRef = useRef(false);
-  const navigate = useNavigate();
 
   useEffect(() => {
     if (calledRef.current) return;
@@ -39,92 +37,148 @@ function RestaurantFullDetails() {
     }
   };
 
-  const addGeoLocation = (restaurantPID: string) => {
-    navigate("/dashboard/restaurants/geolocation", {
-      state: { restaurantPID: restaurantPID },
-    });
-  };
-
   return (
     <div className="">
       {/* Restaurant Details */}
-      <div className={parent_div}>
-        <div className="p-6 border-b border-slate-200/50 dark:border-slate-700/50">
-          <div className="flex items-center justify-between">
+      <div className="bg-gradient-to-br from-slate-800/90 to-slate-900/90 rounded-2xl backdrop-blur-xl overflow-hidden border border-white/10 shadow-xl">
+        {/* Header */}
+        <div className="p-6 border-b border-white/10 bg-gradient-to-r from-blue-500/10 to-purple-500/10">
+          <div className="flex items-center gap-3">
+            <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center shadow-lg shadow-blue-500/25">
+              <Store className="w-6 h-6 text-white" />
+            </div>
             <div>
-              <h3 className="text-lg font-bold text-slate-800 dark:text-white">
+              <h3 className="text-xl font-bold text-white">
                 Restaurant Details
               </h3>
+              <p className="text-sm text-slate-400">Overview and information</p>
             </div>
-            {/*<button
-              className={`${rounded_button} cursor-pointer`}
-              onClick={() => addGeoLocation(restaurantDetails?.pid || "")}
-            >
-              <Plus className="w-4 h-4" />
-              <span className="text-sm font-medium">Add GeoLocation</span>
-            </button>*/}
           </div>
         </div>
-        <div className="p-3.5">
-          <div className="grid grid-cols-2 gap-4 p-4">
-            <div className="p-1">
-              <h2 className={div_h2}>Name</h2>
-              <span className={owner_details_h3}>
+
+        {/* Content */}
+        <div className="p-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            {/* Name */}
+            <div className="p-4 rounded-xl bg-white/5 border border-white/10 hover:bg-white/10 transition-all duration-200">
+              <div className="flex items-center gap-3 mb-2">
+                <div className="w-8 h-8 rounded-lg bg-blue-500/20 flex items-center justify-center">
+                  <Store className="w-4 h-4 text-blue-400" />
+                </div>
+                <span className="text-xs text-slate-500 uppercase tracking-wider font-medium">
+                  Name
+                </span>
+              </div>
+              <p className="text-lg font-semibold text-white pl-11">
                 {restaurantDetails?.name ?? "NA"}
-              </span>
+              </p>
             </div>
-            <div className="p-1">
-              <h2 className={div_h2}>Address</h2>
-              <span className={owner_details_h3}>
+
+            {/* Address */}
+            <div className="p-4 rounded-xl bg-white/5 border border-white/10 hover:bg-white/10 transition-all duration-200 md:col-span-2 lg:col-span-2">
+              <div className="flex items-center gap-3 mb-2">
+                <div className="w-8 h-8 rounded-lg bg-emerald-500/20 flex items-center justify-center">
+                  <MapPin className="w-4 h-4 text-emerald-400" />
+                </div>
+                <span className="text-xs text-slate-500 uppercase tracking-wider font-medium">
+                  Address
+                </span>
+              </div>
+              <p className="text-lg font-semibold text-white pl-11">
                 {restaurantDetails
                   ? `${restaurantDetails.address_line1}, ${restaurantDetails.city}, ${restaurantDetails.state}`
                   : "NA"}
-              </span>
+              </p>
             </div>
-            <div className="p-1">
-              <h2 className={div_h2}>Cuisine</h2>
-              <span className={owner_details_h3}>
-                {restaurantDetails?.cuisine ?? "NA"}
-              </span>
-            </div>
-            <div className="p-1">
-              <h2 className={div_h2}>Food Type</h2>
-              <span className={owner_details_h3}>
-                {restaurantDetails?.food_type ?? "NA"}
-              </span>
-            </div>
-            <div className="p-1">
-              <h2 className={div_h2}>Contact No</h2>
-              <span className={owner_details_h3}>
-                {restaurantDetails?.contact_no ?? "NA"}
-              </span>
-            </div>
-            <div className="p-1 flex justify-baseline">
-              <div className="p-2">
-                <h2 className={div_h2}>Open Time</h2>
-                <span className={owner_details_h3}>
-                  {restaurantDetails?.open_time ?? "NA"}
+
+            {/* Cuisine */}
+            <div className="p-4 rounded-xl bg-white/5 border border-white/10 hover:bg-white/10 transition-all duration-200">
+              <div className="flex items-center gap-3 mb-2">
+                <div className="w-8 h-8 rounded-lg bg-orange-500/20 flex items-center justify-center">
+                  <UtensilsCrossed className="w-4 h-4 text-orange-400" />
+                </div>
+                <span className="text-xs text-slate-500 uppercase tracking-wider font-medium">
+                  Cuisine
                 </span>
               </div>
+              <p className="text-lg font-semibold text-white pl-11">
+                {restaurantDetails?.cuisine ?? "NA"}
+              </p>
+            </div>
 
-              <div className="p-2">
-                <h2 className={div_h2}>Close Time</h2>
-                <span className={owner_details_h3}>
-                  {restaurantDetails?.close_time ?? "NA"}
+            {/* Food Type */}
+            <div className="p-4 rounded-xl bg-white/5 border border-white/10 hover:bg-white/10 transition-all duration-200">
+              <div className="flex items-center gap-3 mb-2">
+                <div className="w-8 h-8 rounded-lg bg-green-500/20 flex items-center justify-center">
+                  <Leaf className="w-4 h-4 text-green-400" />
+                </div>
+                <span className="text-xs text-slate-500 uppercase tracking-wider font-medium">
+                  Food Type
                 </span>
+              </div>
+              <p className="text-lg font-semibold text-white pl-11">
+                {restaurantDetails?.food_type ?? "NA"}
+              </p>
+            </div>
+
+            {/* Contact No */}
+            <div className="p-4 rounded-xl bg-white/5 border border-white/10 hover:bg-white/10 transition-all duration-200">
+              <div className="flex items-center gap-3 mb-2">
+                <div className="w-8 h-8 rounded-lg bg-purple-500/20 flex items-center justify-center">
+                  <Phone className="w-4 h-4 text-purple-400" />
+                </div>
+                <span className="text-xs text-slate-500 uppercase tracking-wider font-medium">
+                  Contact No
+                </span>
+              </div>
+              <p className="text-lg font-semibold text-white pl-11">
+                {restaurantDetails?.contact_no ?? "NA"}
+              </p>
+            </div>
+
+            {/* Timings */}
+            <div className="p-4 rounded-xl bg-white/5 border border-white/10 hover:bg-white/10 transition-all duration-200 md:col-span-2 lg:col-span-3">
+              <div className="flex items-center gap-3 mb-3">
+                <div className="w-8 h-8 rounded-lg bg-cyan-500/20 flex items-center justify-center">
+                  <Clock className="w-4 h-4 text-cyan-400" />
+                </div>
+                <span className="text-xs text-slate-500 uppercase tracking-wider font-medium">
+                  Operating Hours
+                </span>
+              </div>
+              <div className="flex items-center gap-6 pl-11">
+                <div className="flex items-center gap-2">
+                  <span className="text-sm text-slate-400">Opens at</span>
+                  <span className="px-3 py-1 rounded-lg bg-emerald-500/20 text-emerald-400 font-semibold">
+                    {restaurantDetails?.open_time ?? "NA"}
+                  </span>
+                </div>
+                <div className="w-8 h-px bg-white/20"></div>
+                <div className="flex items-center gap-2">
+                  <span className="text-sm text-slate-400">Closes at</span>
+                  <span className="px-3 py-1 rounded-lg bg-red-500/20 text-red-400 font-semibold">
+                    {restaurantDetails?.close_time ?? "NA"}
+                  </span>
+                </div>
               </div>
             </div>
           </div>
         </div>
       </div>
       {/* Categories */}
-      <Categories restaurantID={id ?? null} />
+      <div className="mt-5">
+        <Categories restaurantID={id ?? null} />
+      </div>
 
       {/*Menus*/}
-      <Menus restaurantID={id ?? null} />
+      <div className="mt-5">
+        <Menus restaurantID={id ?? null} />
+      </div>
 
       {/* Table */}
-      <Tables restaurantID={id ?? null} />
+      <div className="mt-5">
+        <Tables restaurantID={id ?? null} />
+      </div>
     </div>
   );
 }

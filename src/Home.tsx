@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 // import { useNavigate } from "react-router-dom";
 
 import Header from "./components/layouts/header";
@@ -18,6 +18,23 @@ function Home() {
     sidebarStore(currentState);
     setsideBarCollapsed(state);
   };
+
+  // Auto-collapse sidebar on tablet/mobile viewports
+  useEffect(() => {
+    const TABLET_BREAKPOINT = 1024;
+
+    const handleResize = () => {
+      if (window.innerWidth < TABLET_BREAKPOINT) {
+        setsideBarCollapsed(true);
+      }
+    };
+
+    // Check on mount
+    handleResize();
+
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
   return (
     <div
       className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50

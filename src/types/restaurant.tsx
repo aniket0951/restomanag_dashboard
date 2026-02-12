@@ -101,6 +101,7 @@ export interface ListRestaurantTablesRes {
   pid: string;
   number: string;
   status: string;
+  capacity: number;
   created_at: number;
 }
 
